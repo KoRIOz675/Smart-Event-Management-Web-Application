@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:18.3-alpine
+    container_name: smart_event_db_dev
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/18/docker
+      - ./migration:/docker-entrypoint-initdb.d
+
+  web:
+    build: 
+      context: .
+      target: dev
+    container_name: smart_event_app_dev
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
