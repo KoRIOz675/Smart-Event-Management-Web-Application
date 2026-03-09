@@ -15,4 +15,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev", "--", "--turbo"]
+CMD ["npm", "run", "dev", "--"]
