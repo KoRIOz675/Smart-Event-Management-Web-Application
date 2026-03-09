@@ -25,7 +25,7 @@ export default function RegisterPage() {
         <input name="fullName" placeholder="Nom complet" required className="p-3 border rounded-lg outline-blue-500 text-gray-800" />
         <input name="email" type="email" placeholder="Email" required className="p-3 border rounded-lg outline-blue-500 text-gray-800" />
         <input name="password" type="password" placeholder="Mot de passe" required className="p-3 border rounded-lg outline-blue-500 text-gray-800" />
-        <select name="role" className="p-3 border rounded-lg bg-white outline-blue-500">
+        <select name="role" className="p-3 border rounded-lg bg-white outline-blue-500 text-gray-800">
           <option value="attendee">Je participe à des événements</option>
           <option value="organizer">J'organise des événements</option>
         </select>
