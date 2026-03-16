@@ -25,35 +25,73 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <Head>
         <title>Connexion | SmartEvent</title>
       </Head>
+      
       <NavBar />
-      <div className="max-w-md mx-auto mt-20 p-8 bg-white rounded-4xl shadow-xl border border-gray-100">
-        <h1 className="text-3xl font-black mb-2 text-center">Connexion</h1>
-        <p className="text-gray-500 text-sm text-center mb-8">Heureux de vous revoir !</p>
 
-        {error && <p className="text-red-500 text-sm mb-4 text-center bg-red-50 p-3 rounded-xl">{error}</p>}
+      <div className="flex flex-col items-center justify-center px-4 pt-20">
+        <div className="w-full max-w-md p-8 bg-card rounded-radius-4xl shadow-2xl border border-border">
+          <h1 className="text-3xl font-black mb-2 text-center tracking-tight">
+            Connexion
+          </h1>
+          <p className="text-muted-foreground text-sm text-center mb-8 font-medium">
+            Heureux de vous revoir !
+          </p>
+          {error && (
+            <div className="bg-destructive/10 text-destructive text-sm mb-6 text-center p-3 rounded-radius-lg border border-destructive/20 animate-in fade-in zoom-in duration-200">
+              {error}
+            </div>
+          )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <input 
-            type="email" placeholder="Email" required
-            className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-indigo-500" 
-            onChange={(e) => setEmail(e.target.value)} 
-          />
-          <input 
-            type="password" placeholder="Mot de passe" required
-            className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-indigo-500" 
-            onChange={(e) => setPassword(e.target.value)} 
-          />
-          <button type="submit" className="w-full bg-indigo-600 text-white p-4 rounded-2xl font-bold hover:bg-indigo-700 transition shadow-lg">
-            Se connecter
-          </button>
-        </form>
-        <p className="text-center text-gray-400 text-sm mt-8">
-          Pas encore de compte ? <a href="/register" className="text-indigo-600 font-bold hover:underline">S'inscrire</a>
-        </p>
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-2">
+                Adresse Email
+              </label>
+              <input 
+                type="email" 
+                placeholder="exemple@email.com" 
+                required
+                className="w-full p-4 rounded-radius-2xl bg-input text-foreground border border-border focus:ring-2 focus:ring-ring outline-none transition-all placeholder:text-muted-foreground/40" 
+                onChange={(e) => setEmail(e.target.value)} 
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-2">
+                Mot de passe
+              </label>
+              <input 
+                type="password" 
+                placeholder="••••••••" 
+                required
+                className="w-full p-4 rounded-radius-2xl bg-input text-foreground border border-border focus:ring-2 focus:ring-ring outline-none transition-all placeholder:text-muted-foreground/40" 
+                onChange={(e) => setPassword(e.target.value)} 
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              className="w-full bg-primary text-primary-foreground p-4 rounded-radius-2xl font-bold hover:opacity-90 transition-all shadow-lg active:scale-95 mt-2"
+            >
+              Se connecter
+            </button>
+          </form>
+          <p className="text-center text-muted-foreground text-sm mt-8">
+            Pas encore de compte ?{' '}
+            <a 
+              href="/register" 
+              className="text-primary font-bold hover:underline underline-offset-4"
+            >
+              S'inscrire
+            </a>
+          </p>
+        </div>
+        <a href="/" className="mt-8 text-muted-foreground text-xs hover:text-foreground transition">
+          ← Retour à l'accueil
+        </a>
       </div>
     </div>
   );
