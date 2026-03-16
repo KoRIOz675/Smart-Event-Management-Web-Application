@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useTheme } from '@/components/theme-provider';
+import { THEME_OPTIONS, useTheme } from '@/components/theme-provider';
 import { useAuth } from '@/context/AuthContext'; 
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { theme, mounted, toggleTheme } = useTheme();
+  const { theme, mounted, setTheme } = useTheme();
   const { user, logout } = useAuth(); 
-  
-  const isDark = mounted && theme === 'dark';
-  const themeButtonLabel = mounted ? (isDark ? 'Mode clair' : 'Mode sombre') : 'Thème';
+
+  const handleThemeChange = (value: string) => {
+    const selectedTheme = THEME_OPTIONS.find((option) => option.value === value)?.value;
+    if (selectedTheme) {
+      setTheme(selectedTheme);
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md transition-colors duration-300">
@@ -28,10 +32,22 @@ const NavBar = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            
-            <button onClick={toggleTheme} className="p-2 rounded-full border border-border hover:bg-secondary text-primary transition">
-              {isDark ? "☀️" : "🌙"}
-            </button>
+            <label className="text-xs font-semibold text-muted-foreground" htmlFor="theme-selector-desktop">
+              Theme
+            </label>
+            <select
+              id="theme-selector-desktop"
+              value={theme}
+              disabled={!mounted}
+              onChange={(event) => handleThemeChange(event.target.value)}
+              className="rounded-radius-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-ring"
+            >
+              {THEME_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
             {user ? (
               <div className="flex items-center gap-4 pl-4 border-l border-border">
                 <div className="flex flex-col items-end">
@@ -49,7 +65,7 @@ const NavBar = () => {
               <div className="flex items-center gap-4">
                 <Link href="/login" className="text-sm font-medium hover:text-primary transition">Connexion</Link>
                 <Link href="/register" className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-primary/20 hover:opacity-90 transition">
-                  S'inscrire
+                  S&apos;inscrire
                 </Link>
               </div>
             )}
@@ -72,6 +88,25 @@ const NavBar = () => {
             </div>
           )}
           <Link href="/explore" className="block text-foreground font-medium py-2">Parcourir</Link>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-semibold text-muted-foreground" htmlFor="theme-selector-mobile">
+              Theme
+            </label>
+            <select
+              id="theme-selector-mobile"
+              value={theme}
+              disabled={!mounted}
+              onChange={(event) => handleThemeChange(event.target.value)}
+              className="w-full rounded-radius-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-ring"
+            >
+              {THEME_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
           
           <div className="pt-4 border-t border-border flex flex-col gap-3">
              {user ? (
@@ -79,7 +114,7 @@ const NavBar = () => {
              ) : (
                <>
                 <Link href="/login" className="w-full border border-border py-3 rounded-radius-xl text-center font-medium">Connexion</Link>
-                <Link href="/register" className="w-full bg-primary text-primary-foreground py-3 rounded-radius-xl text-center font-bold shadow-lg">S'inscrire</Link>
+                <Link href="/register" className="w-full bg-primary text-primary-foreground py-3 rounded-radius-xl text-center font-bold shadow-lg">S&apos;inscrire</Link>
                </>
              )}
           </div>
