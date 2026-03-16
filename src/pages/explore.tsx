@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import router from 'next/router';
 
 interface Event {
   id: string;
@@ -25,7 +26,7 @@ export default function ExplorePage() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch('/api/events');
+        const res = await fetch('/api/events/events');
         const data = await res.json();
         setEvents(data);
         setFilteredEvents(data);
@@ -125,8 +126,11 @@ export default function ExplorePage() {
                         {parseFloat(event.price as string) === 0 ? "Gratuit" : `${event.price}€`}
                       </span>
                     </div>
-                    <button className="bg-secondary text-secondary-foreground px-6 py-3 rounded-radius-xl text-xs font-black hover:bg-primary hover:text-primary-foreground transition-all shadow-sm active:scale-95">
-                      Réserver
+                    <button 
+                      onClick={() => router.push(`/events/${event.id}`)}
+                      className="bg-secondary text-secondary-foreground px-6 py-3 rounded-radius-xl text-xs font-black hover:bg-primary hover:text-primary-foreground transition-all shadow-sm"
+                    >
+                      Voir détails
                     </button>
                   </div>
                 </div>
