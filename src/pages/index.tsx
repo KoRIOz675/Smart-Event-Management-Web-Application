@@ -1,6 +1,5 @@
 import React from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
 import Footer from '@/components/Footer';
 import NavBar from '@/components/NavBar';
 
@@ -8,7 +7,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <Head>
-        <title>SmartEvent | Gestion d'événements intelligente</title>
+        <title>SmartEvent | Gestion d&apos;événements intelligente</title>
         <meta name="description" content="Plateforme complète pour planifier, gérer et participer à des événements." />
       </Head>
       
@@ -34,7 +33,7 @@ export default function Home() {
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
               Créez, gérez et vendez vos tickets en quelques clics. Que ce soit en présentiel, 
-              en virtuel ou en hybride, SmartEvent s'occupe de tout.
+              en virtuel ou en hybride, SmartEvent s&apos;occupe de tout.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4 mb-20">
