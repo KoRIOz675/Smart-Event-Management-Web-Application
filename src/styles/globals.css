@@ -3,6 +3,8 @@
 @import './theme.css';
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant pink-light (&:is(.pink-light *));
+@custom-variant pink-dark (&:is(.pink-dark *));
 
 @layer base {
   * {
