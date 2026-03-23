@@ -29,6 +29,7 @@ const NavBar = () => {
           <div className="hidden md:flex space-x-8">
             <Link href="/explore" className="text-sm font-medium text-muted-foreground hover:text-primary transition">Parcourir</Link>
             <Link href="/organizers" className="text-sm font-medium text-muted-foreground hover:text-primary transition">Organisateurs</Link>
+            <Link href="/my-tickets" className="text-sm font-medium text-muted-foreground hover:text-primary transition">Mes billets</Link>
           </div>
 
           <div className="hidden md:flex items-center gap-4">
