@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { THEME_OPTIONS, useTheme } from '@/components/theme-provider';
-import { useAuth } from '@/context/AuthContext'; 
+import { useAuth } from '@/context/AuthContext';
+import { useLang } from '@/context/LangContext';
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, mounted, setTheme } = useTheme();
-  const { user, logout } = useAuth(); 
+  const { user, logout } = useAuth();
+  const { lang, toggleLang, t } = useLang();
 
   const handleThemeChange = (value: string) => {
     const selectedTheme = THEME_OPTIONS.find((option) => option.value === value)?.value;
@@ -27,14 +29,23 @@ const NavBar = () => {
           </Link>
 
           <div className="hidden md:flex space-x-8">
-            <Link href="/explore" className="text-sm font-medium text-muted-foreground hover:text-primary transition">Parcourir</Link>
-            <Link href="/organizers" className="text-sm font-medium text-muted-foreground hover:text-primary transition">Organisateurs</Link>
-            <Link href="/my-tickets" className="text-sm font-medium text-muted-foreground hover:text-primary transition">Mes billets</Link>
+            <Link href="/explore" className="text-sm font-medium text-muted-foreground hover:text-primary transition">{t.browse}</Link>
+            <Link href="/organizers" className="text-sm font-medium text-muted-foreground hover:text-primary transition">{t.organizers}</Link>
+            <Link href="/my-tickets" className="text-sm font-medium text-muted-foreground hover:text-primary transition">{t.myTickets}</Link>
           </div>
 
           <div className="hidden md:flex items-center gap-4">
+
+            <button
+              onClick={toggleLang}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-radius-lg border border-border text-xs font-bold hover:bg-secondary transition"
+            >
+              <span>{lang === 'fr' ? '🇫🇷' : '🇬🇧'}</span>
+              <span>{lang.toUpperCase()}</span>
+            </button>
+
             <label className="text-xs font-semibold text-muted-foreground" htmlFor="theme-selector-desktop">
-              Theme
+              {t.theme}
             </label>
             <select
               id="theme-selector-desktop"
@@ -49,34 +60,42 @@ const NavBar = () => {
                 </option>
               ))}
             </select>
+
             {user ? (
               <div className="flex items-center gap-4 pl-4 border-l border-border">
                 <div className="flex flex-col items-end">
                   <span className="text-xs font-bold text-foreground leading-none">{user.full_name}</span>
                   <span className="text-[10px] text-primary uppercase font-black tracking-tighter">{user.role}</span>
                 </div>
-                <button 
+                <button
                   onClick={logout}
                   className="px-4 py-2 rounded-radius-lg border border-destructive/20 text-destructive text-xs font-bold hover:bg-destructive hover:text-white transition-all"
                 >
-                  Déconnexion
+                  {t.signOut}
                 </button>
               </div>
             ) : (
               <div className="flex items-center gap-4">
-                <Link href="/login" className="text-sm font-medium hover:text-primary transition">Connexion</Link>
+                <Link href="/login" className="text-sm font-medium hover:text-primary transition">{t.logIn}</Link>
                 <Link href="/register" className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-primary/20 hover:opacity-90 transition">
-                  S&apos;inscrire
+                  {t.signUp}
                 </Link>
               </div>
             )}
           </div>
-
           <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={toggleLang}
+              className="flex items-center gap-1 px-2 py-1 rounded-radius-lg border border-border text-xs font-bold hover:bg-secondary transition"
+            >
+              <span>{lang === 'fr' ? '🇫🇷' : '🇬🇧'}</span>
+              <span>{lang.toUpperCase()}</span>
+            </button>
             <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-foreground">
               {isOpen ? "✕" : "☰"}
             </button>
           </div>
+
         </div>
       </div>
 
@@ -88,11 +107,14 @@ const NavBar = () => {
               <p className="text-xs text-primary uppercase font-black">{user.role}</p>
             </div>
           )}
-          <Link href="/explore" className="block text-foreground font-medium py-2">Parcourir</Link>
+
+          <Link href="/explore" className="block text-foreground font-medium py-2">{t.browse}</Link>
+          <Link href="/organizers" className="block text-foreground font-medium py-2">{t.organizers}</Link>
+          <Link href="/my-tickets" className="block text-foreground font-medium py-2">{t.myTickets}</Link>
 
           <div className="flex flex-col gap-2">
             <label className="text-xs font-semibold text-muted-foreground" htmlFor="theme-selector-mobile">
-              Theme
+              {t.theme}
             </label>
             <select
               id="theme-selector-mobile"
@@ -108,16 +130,18 @@ const NavBar = () => {
               ))}
             </select>
           </div>
-          
+
           <div className="pt-4 border-t border-border flex flex-col gap-3">
-             {user ? (
-               <button onClick={logout} className="w-full bg-destructive text-white py-3 rounded-radius-xl font-bold">Déconnexion</button>
-             ) : (
-               <>
-                <Link href="/login" className="w-full border border-border py-3 rounded-radius-xl text-center font-medium">Connexion</Link>
-                <Link href="/register" className="w-full bg-primary text-primary-foreground py-3 rounded-radius-xl text-center font-bold shadow-lg">S&apos;inscrire</Link>
-               </>
-             )}
+            {user ? (
+              <button onClick={logout} className="w-full bg-destructive text-white py-3 rounded-radius-xl font-bold">
+                {t.signOut}
+              </button>
+            ) : (
+              <>
+                <Link href="/login" className="w-full border border-border py-3 rounded-radius-xl text-center font-medium">{t.logIn}</Link>
+                <Link href="/register" className="w-full bg-primary text-primary-foreground py-3 rounded-radius-xl text-center font-bold shadow-lg">{t.signUp}</Link>
+              </>
+            )}
           </div>
         </div>
       )}

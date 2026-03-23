@@ -4,11 +4,15 @@ import Head from 'next/head';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
+import { useLang } from '@/context/LangContext';
 
 export default function EventDetails() {
   const router = useRouter();
   const { id } = router.query;
   const { user } = useAuth();
+  const { t, lang } = useLang();
+  const d = t.eventDetails;
+
   const [event, setEvent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
@@ -23,21 +27,20 @@ export default function EventDetails() {
         setLoading(false);
       })
       .catch(() => {
-        setMessage("Erreur de chargement : Événement introuvable.");
+        setMessage(d.loadError);
         setLoading(false);
       });
   }, [id]);
-  
 
   const handleBooking = async () => {
     if (!user) {
-        setMessage("Veuillez vous connecter pour réserver.");
-        return router.push('/login');
+      setMessage(d.loginRedirectMsg);
+      return router.push('/login');
     }
-    
+
     setBookingLoading(true);
     setMessage('');
-    
+
     try {
       const res = await fetch('/api/bookings/create', {
         method: 'POST',
@@ -46,22 +49,41 @@ export default function EventDetails() {
       });
 
       const data = await res.json();
-      
+
       if (res.ok) {
-        setMessage(" Votre ticket est réservé. Redirection vers 'Mes Billets'...");
+        setMessage(d.successMsg);
         setTimeout(() => router.push('/my-tickets'), 2000);
       } else {
-        setMessage(data.message || "Erreur lors de la réservation.");
+        setMessage(data.message || d.bookingError);
       }
     } catch (err) {
-      setMessage("Erreur réseau lors de la tentative de réservation.");
+      setMessage(d.networkError);
     } finally {
       setBookingLoading(false);
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-primary">Chargement...</div>;
-  if (!event || message.includes("Événement introuvable")) return <div className="min-h-screen bg-background flex items-center justify-center text-destructive">Événement introuvable</div>;
+  const formatDateTime = (date: string) =>
+    new Date(date).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+  if (loading) return (
+    <div className="min-h-screen bg-background flex items-center justify-center text-primary">
+      {d.loading}
+    </div>
+  );
+
+  if (!event || message.includes(d.notFound)) return (
+    <div className="min-h-screen bg-background flex items-center justify-center text-destructive">
+      {d.notFound}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
@@ -76,7 +98,7 @@ export default function EventDetails() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-12">
- 
+
           <div className="md:col-span-2">
             <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">{event.title}</h1>
             <div className="flex flex-wrap items-center gap-4 mb-8">
@@ -84,62 +106,61 @@ export default function EventDetails() {
                 {event.category}
               </span>
               <span className="text-muted-foreground text-sm italic">
-                Organisé par <span className="text-foreground font-bold">{event.organizer_name}</span>
+                {d.organizedBy} <span className="text-foreground font-bold">{event.organizer_name}</span>
               </span>
             </div>
 
-            <h2 className="text-xl font-bold mb-4 border-b border-border pb-2">À propos de cet événement</h2>
+            <h2 className="text-xl font-bold mb-4 border-b border-border pb-2">{d.about}</h2>
             <p className="text-muted-foreground leading-relaxed mb-8 text-lg">
               {event.description}
             </p>
 
             <div className="p-6 bg-card rounded-radius-2xl border border-border">
-              <h3 className="font-bold mb-2">📍 Lieu</h3>
+              <h3 className="font-bold mb-2">{d.location}</h3>
               <p className="text-muted-foreground">{event.location}</p>
               <p className="text-xs mt-2 text-muted-foreground italic">
-                Date et Heure : {new Date(event.start_date).toLocaleString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                {d.dateTime} {formatDateTime(event.start_date)}
               </p>
             </div>
           </div>
 
           <div className="relative">
             <div className="sticky top-24 p-8 bg-card border border-border rounded-radius-4xl shadow-2xl text-center">
-              <p className="text-sm text-muted-foreground uppercase font-bold mb-2">Tarif d'entrée</p>
+              <p className="text-sm text-muted-foreground uppercase font-bold mb-2">{d.entryFee}</p>
               <p className="text-4xl font-black mb-6">
-                {parseFloat(event.price) === 0 ? "Gratuit" : `${event.price}€`}
+                {parseFloat(event.price) === 0 ? d.free : `${event.price}€`}
               </p>
 
               {user ? (
-                <button 
+                <button
                   onClick={handleBooking}
                   disabled={bookingLoading || event.capacity <= 0}
                   className="w-full bg-primary text-primary-foreground py-4 rounded-radius-2xl font-bold hover:opacity-90 transition shadow-lg shadow-primary/30 active:scale-[0.98] disabled:opacity-50 disabled:shadow-none"
                 >
-                  {bookingLoading ? "Traitement..." : event.capacity > 0 ? "Réserver mon ticket" : "Complet"}
+                  {bookingLoading ? d.processing : event.capacity > 0 ? d.reserve : d.soldOut}
                 </button>
               ) : (
                 <div className="space-y-4">
                   <p className="text-xs text-destructive/80 italic font-bold">
-                    Vous devez être connecté pour réserver.
+                    {d.loginRequired}
                   </p>
-                  <button 
+                  <button
                     onClick={() => router.push('/login')}
                     className="w-full bg-secondary text-foreground py-4 rounded-radius-2xl font-bold hover:bg-border transition active:scale-95"
                   >
-                    Se connecter
+                    {d.loginBtn}
                   </button>
                 </div>
               )}
-              
+
               <div className="mt-6 pt-6 border-t border-border space-y-3">
                 {message && (
                   <p className={`text-center text-sm font-bold ${message.startsWith('✅') ? 'text-primary' : 'text-destructive'}`}>
                     {message}
                   </p>
                 )}
-                
                 <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Places restantes :</span>
+                  <span className="text-muted-foreground">{d.spotsLeft}</span>
                   <span className="font-bold text-primary">{event.capacity}</span>
                 </div>
               </div>
