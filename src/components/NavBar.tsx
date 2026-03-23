@@ -29,9 +29,11 @@ const NavBar = () => {
           </Link>
 
           <div className="hidden md:flex space-x-8">
-            <Link href="/explore" className="text-sm font-medium text-muted-foreground hover:text-primary transition">{t.browse}</Link>
-            <Link href="/organizers" className="text-sm font-medium text-muted-foreground hover:text-primary transition">{t.organizers}</Link>
-            <Link href="/my-tickets" className="text-sm font-medium text-muted-foreground hover:text-primary transition">{t.myTickets}</Link>
+            <Link href="/explore" className="block text-foreground font-medium py-2">{t.browse}</Link>
+            {user?.role === 'organizer' && (
+              <Link href="/organizers" className="block text-foreground font-medium py-2">{t.organizers}</Link>
+            )}
+            <Link href="/my-tickets" className="block text-foreground font-medium py-2">{t.myTickets}</Link>
           </div>
 
           <div className="hidden md:flex items-center gap-4">
