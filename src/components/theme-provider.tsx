@@ -7,13 +7,18 @@ import React, {
     useState,
 } from 'react';
 
-export type Theme = 'light' | 'dark' | 'pinklight' | 'pinkdark';
+export type Theme = 'light' | 'dark' | 'pinklight' | 'pinkdark' | 'green' | 'cookiesclick' | 'school' | 'league' | 'cyber';
 
 export const THEME_OPTIONS: Array<{ value: Theme; label: string }> = [
     {value: 'light', label: 'Clair'},
     {value: 'dark', label: 'Sombre'},
     {value: 'pinklight', label: 'Rose claire'},
     {value: 'pinkdark', label: 'Rose sombre'},
+    {value: 'green', label: 'Vert'},
+    {value: 'cookiesclick', label: 'Cookies'},
+    {value: 'school', label: 'Isep'},
+    {value: 'league', label: 'League'},
+    {value: 'cyber', label: 'Cyber'},
 ];
 
 type ThemeContextValue = {
@@ -24,13 +29,18 @@ type ThemeContextValue = {
 };
 
 const STORAGE_KEY = 'smart-event-theme';
-const ROOT_THEME_CLASSES = ['dark', 'pink-light', 'pink-dark'];
+const ROOT_THEME_CLASSES = ['dark', 'pink-light', 'pink-dark', 'green', 'cookiesclick', 'school', 'league', 'cyber'];
 
 const ROOT_CLASS_BY_THEME: Record<Theme, string | null> = {
     light: null,
     dark: 'dark',
     pinklight: 'pink-light',
     pinkdark: 'pink-dark',
+    green: 'green',
+    cookiesclick: 'cookiesclick',
+    school: 'school',
+    league: 'league',
+    cyber: 'cyber',
 };
 
 const COLOR_SCHEME_BY_THEME: Record<Theme, 'light' | 'dark'> = {
@@ -38,6 +48,11 @@ const COLOR_SCHEME_BY_THEME: Record<Theme, 'light' | 'dark'> = {
     dark: 'dark',
     pinklight: 'light',
     pinkdark: 'dark',
+    green: 'dark',
+    cookiesclick: 'dark',
+    school: 'light',
+    league: 'dark',
+    cyber: 'dark',
 };
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
@@ -55,7 +70,7 @@ const parseTheme = (value: string | null): Theme | null => {
         return 'pinklight';
     }
 
-    if (value === 'light' || value === 'dark' || value === 'pinklight' || value === 'pinkdark') {
+    if (value === 'light' || value === 'dark' || value === 'cyber' || value === 'pinklight' || value === 'pinkdark' || value === 'green' || value === 'cookiesclick' || value === 'school' || value === 'league') {
         return value;
     }
 

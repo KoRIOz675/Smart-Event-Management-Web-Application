@@ -5,7 +5,7 @@ const themeInitScript = `
     try {
       const storageKey = 'smart-event-theme';
       const storedTheme = window.localStorage.getItem(storageKey);
-      const theme = storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'pinklight' || storedTheme === 'pinkdark'
+      const theme = storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'cyber' || storedTheme === 'league' || storedTheme === 'pinklight' || storedTheme === 'pinkdark' || storedTheme === 'green' || storedTheme === 'cookiesclick' || storedTheme === 'school';
         ? storedTheme
         : storedTheme === 'pink'
           ? 'pinklight'
@@ -19,12 +19,22 @@ const themeInitScript = `
         dark: 'dark',
         pinklight: 'pink-light',
         pinkdark: 'pink-dark',
+        green: 'green',
+        cookiesclick: 'cookiesclick',
+        school: 'school',
+        league: 'league',
+        cyber: 'cyber',
       };
       const colorSchemeByTheme = {
         light: 'light',
         dark: 'dark',
         pinklight: 'light',
         pinkdark: 'dark',
+        green: 'dark',
+        cookiesclick: 'dark',
+        school: 'light',
+        league: 'dark',
+        cyber: 'dark',
       };
 
       const rootClass = classNameByTheme[theme];
