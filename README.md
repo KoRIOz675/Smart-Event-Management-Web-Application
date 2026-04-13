@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smart Event Management Web Application
+
+A full-stack web application for discovering, booking, and managing events — built with Next.js, PostgreSQL, and Tailwind CSS.
+
+## Features
+
+- **Event discovery** — browse and search events by name, location, and date
+- **Event detail pages** — full event information with booking support
+- **Organizer profiles** — dedicated pages for event organizers
+- **User authentication** — register, log in, and manage your account
+- **Ticket booking** — book tickets and view your bookings in "My Tickets"
+- **Dark/light theme** — persistent theme toggle
+- **Multilingual UI** — French and English support via a language context
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (Pages Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| Database | PostgreSQL 18 |
+| Auth | bcryptjs (password hashing) |
+| Containerization | Docker / Docker Compose |
+
+## Project Structure
+
+```
+src/
+├── pages/
+│   ├── api/
+│   │   ├── auth/        # login, register
+│   │   ├── bookings/    # create booking, user bookings
+│   │   └── events/      # list events, event by ID, create event
+│   ├── events/[id].tsx  # event detail page
+│   ├── explore.tsx      # browse all events
+│   ├── my-tickets.tsx   # user bookings
+│   ├── organizers.tsx   # organizer directory
+│   ├── login.tsx
+│   └── register.tsx
+├── components/
+│   ├── NavBar.tsx
+│   └── Footer.tsx
+├── context/
+│   ├── AuthContext.tsx  # authentication state
+│   └── LangContext.tsx  # i18n (FR/EN)
+└── lib/
+    └── db.ts            # PostgreSQL client
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- [Docker](https://www.docker.com/) and Docker Compose
+- Or Node.js 18+ and a running PostgreSQL instance
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Run with Docker (recommended)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Copy the example environment file and fill in your values:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   cp .env.example .env
+   ```
 
-## Learn More
+   Required variables:
 
-To learn more about Next.js, take a look at the following resources:
+   ```env
+   POSTGRES_USER=your_user
+   POSTGRES_PASSWORD=your_password
+   POSTGRES_DB=smart_event
+   DATABASE_URL=postgresql://your_user:your_password@db:5432/smart_event
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Start the application:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   docker compose up --build
+   ```
 
-## Deploy on Vercel
+3. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The database schema is applied automatically from `migration/init_schema.sql` on first start.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Run locally (without Docker)
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Set your `DATABASE_URL` in a `.env.local` file pointing to a local PostgreSQL instance.
+
+3. Apply the database schema:
+
+   ```bash
+   psql $DATABASE_URL -f migration/init_schema.sql
+   ```
+
+4. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+## Available Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
