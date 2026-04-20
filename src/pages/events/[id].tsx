@@ -154,11 +154,15 @@ export default function EventDetails() {
               )}
 
               <div className="mt-6 pt-6 border-t border-border space-y-3">
-                {message && (
-                  <p className={`text-center text-sm font-bold ${message.startsWith('✅') ? 'text-primary' : 'text-destructive'}`}>
-                    {message}
-                  </p>
-                )}
+                  {message && (
+                    <p className={`text-center text-sm font-bold p-2 rounded ${
+                      message === d.successMsg 
+                        ? 'text-green-600 bg-green-50 border border-green-200' 
+                        : 'text-destructive bg-destructive/10'          
+                    }`}>
+                      {message}
+                    </p>
+                  )}
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">{d.spotsLeft}</span>
                   <span className="font-bold text-primary">{event.capacity}</span>

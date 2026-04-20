@@ -1,10 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs';
-import { Pool } from 'pg';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+import { db } from '@/lib';
+import { users } from '@/lib/schema';
+import { eq } from 'drizzle-orm';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -18,28 +16,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const existingUser = await pool.query(
-      'SELECT id FROM users WHERE email = $1', 
-      [email]
-    );
+    const existingUser = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
 
-    if (existingUser.rows.length > 0) {
+    if (existingUser.length > 0) {
       return res.status(400).json({ message: 'Cet email est déjà utilisé' });
     }
+
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const insertQuery = `
-      INSERT INTO users (full_name, email, password_hash, role)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id, email
-    `;
-    
-    const values = [full_name, email, hashedPassword, role || 'attendee'];
-    
-    const result = await pool.query(insertQuery, values);
+    const [newUser] = await db.insert(users).values({
+      fullName: full_name,
+      email: email,
+      passwordHash: hashedPassword,
+      role: role || 'attendee', 
+    }).returning({ 
+      id: users.id, 
+      email: users.email 
+    });
+
     return res.status(201).json({
       message: 'Utilisateur créé avec succès',
-      user: result.rows[0]
+      user: newUser
     });
 
   } catch (error) {

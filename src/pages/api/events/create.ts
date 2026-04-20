@@ -1,50 +1,65 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Pool } from 'pg';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+import { db } from '@/lib';
+import { events, ticketTypes } from '@/lib/schema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).end();
   }
 
-  const organizer_id = req.body.organizer_id; 
-
-  const { title, description, location, start_date, end_date, category, capacity, ticket_types } = req.body;
+  const { 
+    organizer_id, 
+    title, 
+    description, 
+    location, 
+    start_date, 
+    end_date, 
+    category, 
+    capacity, 
+    ticket_types 
+  } = req.body;
 
   try {
-    const eventInsertQuery = `
-      INSERT INTO events (organizer_id, title, description, location, start_date, end_date, capacity, category)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING id;
-    `;
-    
-    const eventResult = await pool.query(eventInsertQuery, [
-        organizer_id, title, description, location, start_date, end_date, capacity, category
-    ]);
+    const newEventId = await db.transaction(async (tx) => {
+      
+      const [insertedEvent] = await tx.insert(events).values({
+        organizerId: organizer_id,
+        title,
+        description,
+        location,
+        startDate: new Date(start_date), 
+        endDate: new Date(end_date),     
+        capacity: parseInt(capacity),
+        category,
+      }).returning({ id: events.id });
 
-    const newEventId = eventResult.rows[0].id;
-    if (ticket_types && Array.isArray(ticket_types) && ticket_types.length > 0) {
-        const ticketInsertQuery = `
-            INSERT INTO ticket_types (event_id, name, price, quantity_available)
-            VALUES ($1, $2, $3, $4);
-        `;
-        for (const ticket of ticket_types) {
-            await pool.query(ticketInsertQuery, [
-                newEventId, 
-                ticket.name, 
-                ticket.price, 
-                ticket.quantity_available
-            ]);
-        }
-    } else {
-        await pool.query(
-            'INSERT INTO ticket_types (event_id, name, price, quantity_available) VALUES ($1, $2, $3, $4)',
-            [newEventId, 'Standard', 0.00, capacity]
-        );
-    }
+      const eventId = insertedEvent.id;
 
-    return res.status(201).json({ message: "Événement créé avec succès", eventId: newEventId });
+      if (ticket_types && Array.isArray(ticket_types) && ticket_types.length > 0) {
+        const ticketsToInsert = ticket_types.map((ticket: any) => ({
+          eventId: eventId,
+          name: ticket.name,
+          price: ticket.price.toString(), 
+          quantityAvailable: parseInt(ticket.quantity_available),
+        }));
+
+        await tx.insert(ticketTypes).values(ticketsToInsert);
+      } else {
+        await tx.insert(ticketTypes).values({
+          eventId: eventId,
+          name: 'Standard',
+          price: "0.00",
+          quantityAvailable: parseInt(capacity),
+        });
+      }
+
+      return eventId;
+    });
+
+    return res.status(201).json({ 
+      message: "Événement créé avec succès", 
+      eventId: newEventId 
+    });
 
   } catch (error) {
     console.error("Erreur lors de la création de l'événement :", error);
