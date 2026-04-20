@@ -9,10 +9,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const [eventCount] = await db.select({ count: sql<number>`count(*)` }).from(events);
     const [bookingCount] = await db.select({ count: sql<number>`count(*)` }).from(bookings);
 
+    const allUsers = await db.select().from(users).orderBy(users.fullName);
+
     return res.status(200).json({
       totalUsers: Number(userCount.count),
       totalEvents: Number(eventCount.count),
       totalBookings: Number(bookingCount.count),
+      allUsers,
     });
   } catch (error) {
     return res.status(500).json({ message: "Erreur serveur" });
