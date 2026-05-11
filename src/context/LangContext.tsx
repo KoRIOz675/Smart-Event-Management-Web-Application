@@ -24,6 +24,7 @@ const translations = {
     solutionTitle: 'A complete solution',
     solutionDesc: 'Everything you need to make your event a success.',
     organizersTitle: 'For Organizers',
+    admin: 'Admin',
     organizersFeatures: [
       'Multi-ticket event creation',
       'Real-time analytics dashboard',
@@ -184,6 +185,7 @@ createEvent: {
     solutionTitle: 'Une solution complète',
     solutionDesc: 'Tout ce dont vous avez besoin pour réussir votre projet événementiel.',
     organizersTitle: 'Pour les Organisateurs',
+    admin: 'Admin',
     organizersFeatures: [
       "Création d'événements multi-tickets",
       'Dashboard analytique en temps réel',
