@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Footer from '@/components/Footer';
 import NavBar from '@/components/NavBar';
 import { useLang } from '@/context/LangContext';
+import {SearchBar} from "@/components/Searchbar";
 
 export default function Home() {
   const { t } = useLang();
@@ -49,28 +50,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="max-w-5xl mx-auto px-4 -mt-24 relative z-20">
-          <div className="bg-card p-3 rounded-radius-4xl shadow-2xl border border-border flex flex-col md:flex-row gap-2">
-            <div className="flex-1 p-4 flex flex-col justify-center border-b md:border-b-0 md:border-r border-border">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1 mb-1">{t.searchEvent}</label>
-              <input type="text" placeholder={t.searchEventPlaceholder} className="bg-transparent text-foreground font-semibold focus:outline-none placeholder:text-muted-foreground/50" />
-            </div>
-            <div className="flex-1 p-4 flex flex-col justify-center border-b md:border-b-0 md:border-r border-border">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1 mb-1">{t.searchWhere}</label>
-              <input type="text" placeholder={t.searchWherePlaceholder} className="bg-transparent text-foreground font-semibold focus:outline-none placeholder:text-muted-foreground/50" />
-            </div>
-            <div className="flex-1 p-4 flex flex-col justify-center">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1 mb-1">{t.searchWhen}</label>
-              <input type="date" className="bg-transparent text-foreground font-semibold focus:outline-none" />
-            </div>
-            <button className="bg-primary text-primary-foreground px-8 py-4 rounded-radius-2xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              {t.searchBtn}
-            </button>
-          </div>
-        </section>
+        <SearchBar t={t} />
 
         <section className="py-32 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
