@@ -29,17 +29,17 @@ const Footer = () => {
           </h4>
           <ul className="space-y-4 text-sm text-muted-foreground">
             <li>
-              <Link href="/events" className="hover:text-primary transition-colors underline-offset-4 hover:underline">
+              <Link href="/explore" className="hover:text-primary transition-colors underline-offset-4 hover:underline">
                 {f.browseEvents}
               </Link>
             </li>
             <li>
-              <Link href="/ticketing" className="hover:text-primary transition-colors underline-offset-4 hover:underline">
+              <Link href="/my-tickets" className="hover:text-primary transition-colors underline-offset-4 hover:underline">
                 {f.ticketing}
               </Link>
             </li>
             <li>
-              <Link href="/virtual" className="hover:text-primary transition-colors underline-offset-4 hover:underline">
+              <Link href="/explore" className="hover:text-primary transition-colors underline-offset-4 hover:underline">
                 {f.virtualEvents}
               </Link>
             </li>
