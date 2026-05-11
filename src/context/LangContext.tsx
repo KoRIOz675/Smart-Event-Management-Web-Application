@@ -55,21 +55,37 @@ const translations = {
       logIn: 'Log in',
       backHome: '← Back to home',
     },
-    login: {
-  title: 'Log In',
-  subtitle: 'Welcome back!',
-  email: 'Email address',
-  emailPlaceholder: 'example@email.com',
-  password: 'Password',
-  passwordPlaceholder: '••••••••',
-  submit: 'Log in',
-  submitting: 'Logging in...',
-  noAccount: 'No account yet?',
-  signUp: 'Sign up',
-  backHome: '← Back to home',
-  defaultError: 'Invalid credentials or account not found',
-  networkError: 'An error occurred while logging in.',
-},
+      login: {
+          title: 'Log In',
+          subtitle: 'Welcome back!',
+          email: 'Email address',
+          emailPlaceholder: 'example@email.com',
+          password: 'Password',
+          passwordPlaceholder: '••••••••',
+          submit: 'Log in',
+          submitting: 'Logging in...',
+          noAccount: 'No account yet?',
+          signUp: 'Sign up',
+          backHome: '← Back to home',
+          defaultError: 'Invalid credentials or account not found',
+          networkError: 'An error occurred while logging in.',
+      },
+      ticketsPage: {
+          pageTitle: 'My Tickets 🎟️',
+          loading: 'Loading...',
+          loginRequired: 'Please log in.',
+          noBookings: 'You have no bookings yet.',
+          location: 'Location',
+          editProfile: 'Edit Profile',
+          status: 'Status',
+          totalEvents: 'Total Events',
+          favoriteSpot: 'Favorite Spot',
+          findMore: 'Find more events →',
+          legend: 'Legend',
+          explorer: 'Explorer',
+          newcomer: 'Newcomer',
+          na: 'N/A'
+      },
 explore: {
   pageTitle: 'Explore Events | SmartEvent',
   title: 'Explore',
@@ -105,13 +121,6 @@ eventDetails: {
   bookingError: 'Error during booking.',
   networkError: 'Network error during booking attempt.',
   loadError: 'Loading error: Event not found.',
-},
-ticketsPage: {
-  pageTitle: 'My Tickets 🎟️',
-  loading: 'Loading...',
-  loginRequired: 'Please log in.',
-  noBookings: 'You have no bookings yet.',
-  location: 'Location',
 },
 footer: {
   tagline: '"Making every event memorable through simplified and intelligent management."',
@@ -216,21 +225,37 @@ createEvent: {
       logIn: 'Se connecter',
       backHome: "← Retour à l'accueil",
     },
-    login: {
-  title: 'Log In',
-  subtitle: 'Welcome back!',
-  email: 'Email address',
-  emailPlaceholder: 'example@email.com',
-  password: 'Password',
-  passwordPlaceholder: '••••••••',
-  submit: 'Log in',
-  submitting: 'Logging in...',
-  noAccount: 'No account yet?',
-  signUp: 'Sign up',
-  backHome: '← Back to home',
-  defaultError: 'Invalid credentials or account not found',
-  networkError: 'An error occurred while logging in.',
-},
+  login: {
+      title: 'Connexion',
+      subtitle: 'Bon retour parmi nous !',
+      email: 'Adresse e-mail',
+      emailPlaceholder: 'exemple@email.com',
+      password: 'Mot de passe',
+      passwordPlaceholder: '••••••••',
+      submit: 'Se connecter',
+      submitting: 'Connexion en cours...',
+      noAccount: 'Pas encore de compte ?',
+      signUp: "S'inscrire",
+      backHome: "← Retour à l'accueil",
+      defaultError: 'Identifiants invalides ou compte introuvable',
+      networkError: 'Une erreur est survenue lors de la connexion.',
+  },
+  ticketsPage: {
+      pageTitle: 'Mes Billets 🎟️',
+      loading: 'Chargement...',
+      loginRequired: 'Veuillez vous connecter.',
+      noBookings: "Vous n'avez pas encore de réservations.",
+      location: 'Lieu',
+      editProfile: 'Modifier le profil',
+      status: 'Statut',
+      totalEvents: 'Total Événements',
+      favoriteSpot: 'Lieu Favori',
+      findMore: 'Trouver plus d\'événements →',
+      legend: 'Légende',
+      explorer: 'Explorateur',
+      newcomer: 'Nouveau',
+      na: 'N/A'
+      },
 explore: {
   pageTitle: 'Explorer les événements | SmartEvent',
   title: 'Explorez les',
@@ -265,13 +290,6 @@ eventDetails: {
   bookingError: 'Erreur lors de la réservation.',
   networkError: 'Erreur réseau lors de la tentative de réservation.',
   loadError: 'Erreur de chargement : Événement introuvable.',
-},
-ticketsPage: {
-  pageTitle: 'Mes Billets 🎟️',
-  loading: 'Chargement...',
-  loginRequired: 'Veuillez vous connecter.',
-  noBookings: "Vous n'avez pas encore de réservations.",
-  location: 'Lieu',
 },
 footer: {
   tagline: '"Rendre chaque événement mémorable grâce à une gestion simplifiée et intelligente."',
@@ -310,17 +328,17 @@ createEvent: {
     business: 'Business/Conférence',
     cultural: 'Culturel',
   },
-  startDate: 'Début',
-  endDate: 'Fin',
-  capacity: 'Capacité Totale',
-  ticketTypes: 'Types de Billets',
-  ticketNamePlaceholder: 'Nom du ticket (VIP, Standard)',
-  ticketPricePlaceholder: 'Prix (€)',
-  ticketQtyPlaceholder: 'Quantité',
-  addTicket: '+ Ajouter un Type de Ticket',
-  submit: "Publier l'Événement",
-  submitting: 'Création en cours...',
-},
+      startDate: 'Début',
+      endDate: 'Fin',
+      capacity: 'Capacité Totale',
+      ticketTypes: 'Types de Billets',
+      ticketNamePlaceholder: 'Nom du ticket (VIP, Standard)',
+      ticketPricePlaceholder: 'Prix (€)',
+      ticketQtyPlaceholder: 'Quantité',
+      addTicket: '+ Ajouter un Type de Ticket',
+      submit: "Publier l'Événement",
+      submitting: 'Création en cours...',
+    },
   },
 };
 
@@ -328,27 +346,27 @@ type Lang = 'en' | 'fr';
 type Translations = typeof translations.en;
 
 interface LangContextType {
-  lang: Lang;
-  toggleLang: () => void;
-  t: Translations;
+    lang: Lang;
+    toggleLang: () => void;
+    t: Translations;
 }
 
 const LangContext = createContext<LangContextType | undefined>(undefined);
 
 export const LangProvider = ({ children }: { children: React.ReactNode }) => {
-  const [lang, setLang] = useState<Lang>('fr');
-  const toggleLang = () => setLang((prev) => (prev === 'fr' ? 'en' : 'fr'));
-  const t = translations[lang];
+    const [lang, setLang] = useState<Lang>('fr');
+    const toggleLang = () => setLang((prev) => (prev === 'fr' ? 'en' : 'fr'));
+    const t = translations[lang];
 
-  return (
-    <LangContext.Provider value={{ lang, toggleLang, t }}>
-      {children}
-    </LangContext.Provider>
-  );
+    return (
+        <LangContext.Provider value={{ lang, toggleLang, t }}>
+            {children}
+        </LangContext.Provider>
+    );
 };
 
 export const useLang = () => {
-  const ctx = useContext(LangContext);
-  if (!ctx) throw new Error('useLang must be used within a LangProvider');
-  return ctx;
+    const ctx = useContext(LangContext);
+    if (!ctx) throw new Error('useLang must be used within a LangProvider');
+    return ctx;
 };
