@@ -33,6 +33,12 @@ const NavBar = () => {
             {user?.role === 'organizer' && (
               <Link href="/organizers" className="block text-foreground font-medium py-2">{t.organizers}</Link>
             )}
+            {user?.role === 'admin' && (
+              <Link href="/organizers" className="block text-foreground font-medium py-2">{t.organizers}</Link>
+            )}
+            {user?.role === 'admin' && (
+              <Link href="/admin" className="block font-medium py-2" style={{ color: '#ef4444' }}>{t.admin}</Link>
+            )}
             <Link href="/my-tickets" className="block text-foreground font-medium py-2">{t.myTickets}</Link>
           </div>
 
