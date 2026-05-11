@@ -1,0 +1,232 @@
+import React, { useState } from 'react';
+import Head from 'next/head';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
+import { useAuth } from '@/context/AuthContext';
+import { useLang } from '@/context/LangContext';
+import { THEME_OPTIONS, useTheme } from '@/components/theme-provider';
+
+export default function SettingsPage() {
+    const { user, loading: authLoading } = useAuth();
+    const { lang, toggleLang, t } = useLang();
+    const { theme, mounted, setTheme } = useTheme();
+
+    // Local state for UI tabs and mock toggles
+    const [activeTab, setActiveTab] = useState('preferences');
+    const [notifications, setNotifications] = useState({
+        emailAlerts: true,
+        marketing: false,
+        ticketUpdates: true,
+    });
+
+    const handleThemeChange = (value: string) => {
+        const selectedTheme = THEME_OPTIONS.find((option) => option.value === value)?.value;
+        if (selectedTheme) setTheme(selectedTheme);
+    };
+
+    if (authLoading) return <div className="min-h-screen flex items-center justify-center font-black animate-pulse uppercase tracking-widest">{t.ticketsPage?.loading || 'Loading...'}</div>;
+    if (!user) return <div className="min-h-screen flex items-center justify-center font-bold">{t.ticketsPage?.loginRequired || 'Please log in.'}</div>;
+
+    const userName = user?.fullName || user?.full_name || 'User';
+    const userInitial = userName.charAt(0).toUpperCase();
+
+    return (
+        <div className="min-h-screen bg-background text-foreground flex flex-col">
+            <Head><title>Settings | SmartEvent</title></Head>
+            <NavBar />
+
+            <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-12">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-black tracking-tighter uppercase">Settings</h1>
+                    <p className="text-muted-foreground text-sm mt-1">Manage your account preferences and configurations.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    {/* Sidebar Navigation */}
+                    <aside className="col-span-1 space-y-2">
+                        <button
+                            onClick={() => setActiveTab('profile')}
+                            className={`w-full text-left px-4 py-3 rounded-radius-xl font-bold transition-all ${activeTab === 'profile' ? 'bg-primary text-primary-foreground shadow-md' : 'hover:bg-secondary text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Profile Details
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('preferences')}
+                            className={`w-full text-left px-4 py-3 rounded-radius-xl font-bold transition-all ${activeTab === 'preferences' ? 'bg-primary text-primary-foreground shadow-md' : 'hover:bg-secondary text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Preferences
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('notifications')}
+                            className={`w-full text-left px-4 py-3 rounded-radius-xl font-bold transition-all ${activeTab === 'notifications' ? 'bg-primary text-primary-foreground shadow-md' : 'hover:bg-secondary text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Notifications
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('security')}
+                            className={`w-full text-left px-4 py-3 rounded-radius-xl font-bold transition-all ${activeTab === 'security' ? 'bg-primary text-primary-foreground shadow-md' : 'hover:bg-secondary text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Security
+                        </button>
+                    </aside>
+
+                    {/* Main Content Area */}
+                    <div className="col-span-1 md:col-span-3 bg-card border border-border rounded-radius-3xl p-6 md:p-10 shadow-sm">
+
+                        {/* PROFILE TAB */}
+                        {activeTab === 'profile' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                                <h2 className="text-xl font-black uppercase tracking-tight border-b border-border pb-4">Profile Details</h2>
+
+                                <div className="flex items-center gap-6">
+                                    <div className="w-20 h-20 bg-primary rounded-radius-2xl flex items-center justify-center text-3xl font-black text-primary-foreground rotate-3 shadow-md">
+                                        {userInitial}
+                                    </div>
+                                    <div>
+                                        <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded-radius-lg text-xs font-bold hover:bg-primary hover:text-primary-foreground transition">
+                                            Change Avatar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Full Name</label>
+                                        <input type="text" defaultValue={userName} className="w-full bg-background border border-border rounded-radius-lg px-4 py-3 text-sm focus:outline-none focus:border-primary transition" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Email Address</label>
+                                        <input type="email" defaultValue={user.email} disabled className="w-full bg-muted/50 border border-border rounded-radius-lg px-4 py-3 text-sm text-muted-foreground cursor-not-allowed" />
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-border flex justify-end">
+                                    <button className="bg-foreground text-background px-6 py-3 rounded-radius-xl text-sm font-bold shadow-md hover:bg-primary hover:text-primary-foreground transition">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* PREFERENCES TAB */}
+                        {activeTab === 'preferences' && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
+                                <h2 className="text-xl font-black uppercase tracking-tight border-b border-border pb-4">App Preferences</h2>
+
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-radius-xl border border-border hover:border-primary/50 transition">
+                                    <div>
+                                        <h3 className="font-bold">Display Language</h3>
+                                        <p className="text-sm text-muted-foreground">Select your preferred language for the interface.</p>
+                                    </div>
+                                    <button
+                                        onClick={toggleLang}
+                                        className="flex items-center justify-center gap-2 px-4 py-3 rounded-radius-lg border border-border bg-background font-bold hover:bg-secondary transition min-w-[120px]"
+                                    >
+                                        <span className="text-lg">{lang === 'fr' ? '🇫🇷' : '🇬🇧'}</span>
+                                        <span>{lang === 'fr' ? 'Français' : 'English'}</span>
+                                    </button>
+                                </div>
+
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-radius-xl border border-border hover:border-primary/50 transition">
+                                    <div>
+                                        <h3 className="font-bold">Application Theme</h3>
+                                        <p className="text-sm text-muted-foreground">Customize the visual appearance of SmartEvent.</p>
+                                    </div>
+                                    <select
+                                        value={mounted ? theme : 'system'}
+                                        onChange={(e) => handleThemeChange(e.target.value)}
+                                        className="px-4 py-3 rounded-radius-lg border border-border bg-background font-bold text-foreground focus:outline-none focus:border-primary transition min-w-[120px]"
+                                    >
+                                        {THEME_OPTIONS.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* NOTIFICATIONS TAB */}
+                        {activeTab === 'notifications' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                                <h2 className="text-xl font-black uppercase tracking-tight border-b border-border pb-4">Notification Settings</h2>
+
+                                <div className="space-y-4">
+                                    <label className="flex items-center justify-between p-4 rounded-radius-xl border border-border cursor-pointer hover:bg-secondary/50 transition">
+                                        <div>
+                                            <h3 className="font-bold text-sm">Ticket Updates</h3>
+                                            <p className="text-xs text-muted-foreground">Receive emails when your ticket status changes.</p>
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            checked={notifications.ticketUpdates}
+                                            onChange={(e) => setNotifications({...notifications, ticketUpdates: e.target.checked})}
+                                            className="w-5 h-5 accent-primary cursor-pointer"
+                                        />
+                                    </label>
+
+                                    <label className="flex items-center justify-between p-4 rounded-radius-xl border border-border cursor-pointer hover:bg-secondary/50 transition">
+                                        <div>
+                                            <h3 className="font-bold text-sm">Event Reminders</h3>
+                                            <p className="text-xs text-muted-foreground">Get notified 24 hours before an event starts.</p>
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            checked={notifications.emailAlerts}
+                                            onChange={(e) => setNotifications({...notifications, emailAlerts: e.target.checked})}
+                                            className="w-5 h-5 accent-primary cursor-pointer"
+                                        />
+                                    </label>
+
+                                    <label className="flex items-center justify-between p-4 rounded-radius-xl border border-border cursor-pointer hover:bg-secondary/50 transition">
+                                        <div>
+                                            <h3 className="font-bold text-sm">Marketing & Promos</h3>
+                                            <p className="text-xs text-muted-foreground">Receive news and special offers from organizers.</p>
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            checked={notifications.marketing}
+                                            onChange={(e) => setNotifications({...notifications, marketing: e.target.checked})}
+                                            className="w-5 h-5 accent-primary cursor-pointer"
+                                        />
+                                    </label>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* SECURITY TAB */}
+                        {activeTab === 'security' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                                <h2 className="text-xl font-black uppercase tracking-tight border-b border-border pb-4">Security & Account</h2>
+
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Current Password</label>
+                                        <input type="password" placeholder="••••••••" className="w-full md:w-1/2 bg-background border border-border rounded-radius-lg px-4 py-3 text-sm focus:outline-none focus:border-primary transition block" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">New Password</label>
+                                        <input type="password" placeholder="••••••••" className="w-full md:w-1/2 bg-background border border-border rounded-radius-lg px-4 py-3 text-sm focus:outline-none focus:border-primary transition block" />
+                                    </div>
+                                    <button className="bg-foreground text-background px-6 py-3 rounded-radius-xl text-sm font-bold shadow-md hover:bg-primary hover:text-primary-foreground transition mt-4">
+                                        Update Password
+                                    </button>
+                                </div>
+
+                                <div className="pt-8 mt-8 border-t border-border">
+                                    <h3 className="text-destructive font-black uppercase mb-2">Danger Zone</h3>
+                                    <p className="text-sm text-muted-foreground mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+                                    <button className="px-6 py-3 rounded-radius-xl border border-destructive/20 text-destructive text-sm font-bold hover:bg-destructive hover:text-white transition">
+                                        Delete Account
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </main>
+            <Footer />
+        </div>
+    );
+}

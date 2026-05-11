@@ -63,9 +63,11 @@ export default function ProfilePage() {
                         </div>
                         <h1 className="text-2xl font-black tracking-tighter">{user.fullName}</h1>
                         <p className="text-muted-foreground text-sm mb-6">{user.email}</p>
-                        <button className="w-full py-3 bg-secondary text-secondary-foreground rounded-radius-xl text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all">
-                            {m.editProfile}
-                        </button>
+                            <Link
+                                href={`/settings`}
+                                className="w-full py-3 bg-secondary text-secondary-foreground rounded-radius-xl text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all">
+                                {m.editProfile}
+                            </Link>
                     </div>
 
                     {/* Fun Stats Cards */}

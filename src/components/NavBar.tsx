@@ -46,15 +46,7 @@ const NavBar = () => {
                     </div>
 
                     <div className="hidden md:flex items-center gap-4">
-
-                        <button
-                            onClick={toggleLang}
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-radius-lg border border-border text-xs font-bold hover:bg-secondary transition"
-                        >
-                            <span>{lang === 'fr' ? '🇫🇷' : '🇬🇧'}</span>
-                            <span>{lang.toUpperCase()}</span>
-                        </button>
-
+                        {/*
                         <label className="text-xs font-semibold text-muted-foreground" htmlFor="theme-selector-desktop">
                             {t.theme}
                         </label>
@@ -70,7 +62,7 @@ const NavBar = () => {
                                     {option.label}
                                 </option>
                             ))}
-                        </select>
+                        </select>*/}
 
                         {user ? (
                             <div className="flex items-center gap-4 pl-4 border-l border-border">
@@ -136,25 +128,6 @@ const NavBar = () => {
                     <Link href="/explore" className="block text-foreground font-medium py-2">{t.browse}</Link>
                     <Link href="/organizers" className="block text-foreground font-medium py-2">{t.organizers}</Link>
                     <Link href="/profile" className="block text-foreground font-medium py-2">{t.myTickets}</Link>
-
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-semibold text-muted-foreground" htmlFor="theme-selector-mobile">
-                            {t.theme}
-                        </label>
-                        <select
-                            id="theme-selector-mobile"
-                            value={theme}
-                            disabled={!mounted}
-                            onChange={(event) => handleThemeChange(event.target.value)}
-                            className="w-full rounded-radius-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-ring"
-                        >
-                            {THEME_OPTIONS.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
 
                     <div className="pt-4 border-t border-border flex flex-col gap-3">
                         {user ? (
