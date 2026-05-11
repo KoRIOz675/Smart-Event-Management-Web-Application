@@ -129,7 +129,7 @@ export default function ProfilePage() {
                                             </p>
                                         </div>
                                         <Link
-                                            href={`/events/${ticket.id}`}
+                                            href={`/events/${ticket.event_id}`}
                                             className="bg-foreground text-background p-2.5 rounded-radius-xl hover:bg-primary hover:text-primary-foreground transition-all shadow-sm"
                                         >
                                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

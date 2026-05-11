@@ -7,173 +7,197 @@ import { useAuth } from '@/context/AuthContext';
 import { useLang } from '@/context/LangContext';
 
 export default function EventDetails() {
-  const router = useRouter();
-  const { id } = router.query;
-  const { user } = useAuth();
-  const { t, lang } = useLang();
-  const d = t.eventDetails;
+    const router = useRouter();
+    const { id } = router.query;
+    const { user } = useAuth();
+    const { t, lang } = useLang();
+    const d = t.eventDetails;
 
-  const [event, setEvent] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [bookingLoading, setBookingLoading] = useState(false);
-  const [message, setMessage] = useState('');
+    const [event, setEvent] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [bookingLoading, setBookingLoading] = useState(false);
+    const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    if (!id) return;
-    fetch(`/api/events/${id}`)
-      .then(res => res.json())
-      .then(data => {
-        setEvent(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setMessage(d.loadError);
-        setLoading(false);
-      });
-  }, [id]);
+    useEffect(() => {
+        // Wait until Next.js router is ready and 'id' exists
+        if (!id) return;
 
-  const handleBooking = async () => {
-    if (!user) {
-      setMessage(d.loginRedirectMsg);
-      return router.push('/login');
-    }
+        fetch(`/api/events/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                // 1. Check if the API returned an array instead of a single object
+                const eventData = Array.isArray(data) ? data[0] : data;
 
-    setBookingLoading(true);
-    setMessage('');
+                // 2. Check if the API returned an error message or empty data
+                if (!eventData || eventData.error || eventData.message) {
+                    setMessage(d.notFound);
+                    setEvent(null);
+                } else {
+                    setEvent(eventData);
+                }
+                setLoading(false);
+            })
+            .catch(() => {
+                setMessage(d.loadError);
+                setEvent(null);
+                setLoading(false);
+            });
+    }, [id, d.notFound, d.loadError]);
 
-    try {
-      const res = await fetch('/api/bookings/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ event_id: id, user_id: user.id }),
-      });
+    const handleBooking = async () => {
+        if (!user) {
+            setMessage(d.loginRedirectMsg);
+            return router.push('/login');
+        }
 
-      const data = await res.json();
+        setBookingLoading(true);
+        setMessage('');
 
-      if (res.ok) {
-        setMessage(d.successMsg);
-        setTimeout(() => router.push('/my-tickets'), 2000);
-      } else {
-        setMessage(data.message || d.bookingError);
-      }
-    } catch (err) {
-      setMessage(d.networkError);
-    } finally {
-      setBookingLoading(false);
-    }
-  };
+        try {
+            const res = await fetch('/api/bookings/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ event_id: id, user_id: user.id }),
+            });
 
-  const formatDateTime = (date: string) =>
-    new Date(date).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+            const data = await res.json();
 
-  if (loading) return (
-    <div className="min-h-screen bg-background flex items-center justify-center text-primary">
-      {d.loading}
-    </div>
-  );
+            if (res.ok) {
+                setMessage(d.successMsg);
+                setTimeout(() => router.push('/profile'), 2000); // Updated redirect to /profile
+            } else {
+                setMessage(data.message || d.bookingError);
+            }
+        } catch (err) {
+            setMessage(d.networkError);
+        } finally {
+            setBookingLoading(false);
+        }
+    };
 
-  if (!event || message.includes(d.notFound)) return (
-    <div className="min-h-screen bg-background flex items-center justify-center text-destructive">
-      {d.notFound}
-    </div>
-  );
+    const formatDateTime = (dateString: string) => {
+        if (!dateString) return 'TBD'; // Safe fallback for missing dates
+        return new Date(dateString).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
 
-  return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      <Head>
-        <title>{event.title} | SmartEvent</title>
-      </Head>
-      <NavBar />
-
-      <main className="max-w-5xl mx-auto px-4 py-12">
-        <div className="h-64 md:h-96 bg-muted rounded-radius-4xl mb-8 flex items-center justify-center text-8xl">
-          {event.category === 'Technologie' ? '💻' : event.category === 'Musique' ? '🎵' : '📅'}
+    if (loading) return (
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center font-black uppercase tracking-widest text-primary animate-pulse">
+            <NavBar />
+            <div className="flex-1 flex items-center">{d.loading}</div>
         </div>
+    );
 
-        <div className="grid md:grid-cols-3 gap-12">
+    if (!event) return (
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center font-bold text-destructive">
+            <NavBar />
+            <div className="flex-1 flex items-center">{message || d.notFound}</div>
+        </div>
+    );
 
-          <div className="md:col-span-2">
-            <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">{event.title}</h1>
-            <div className="flex flex-wrap items-center gap-4 mb-8">
+    // Safe fallback variables in case database column names differ slightly
+    const displayTitle = event.title || event.event_title || 'Untitled Event';
+    const displayCategory = event.category || 'General';
+    const displayOrganizer = event.organizer_name || 'SmartEvent Organizer';
+    const displayPrice = parseFloat(event.price || 0);
+
+    return (
+        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+            <Head>
+                <title>{displayTitle} | SmartEvent</title>
+            </Head>
+            <NavBar />
+
+            <main className="max-w-5xl mx-auto px-4 py-12">
+                <div className="h-64 md:h-96 bg-muted rounded-radius-4xl mb-8 flex items-center justify-center text-8xl shadow-inner border border-border">
+                    {displayCategory.toLowerCase().includes('tech') ? '💻' :
+                        displayCategory.toLowerCase().includes('musi') ? '🎵' : '📅'}
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-12">
+
+                    <div className="md:col-span-2">
+                        <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">{displayTitle}</h1>
+
+                        <div className="flex flex-wrap items-center gap-4 mb-8">
               <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase">
-                {event.category}
+                {displayCategory}
               </span>
-              <span className="text-muted-foreground text-sm italic">
-                {d.organizedBy} <span className="text-foreground font-bold">{event.organizer_name}</span>
+                            <span className="text-muted-foreground text-sm italic">
+                {d.organizedBy} <span className="text-foreground font-bold">{displayOrganizer}</span>
               </span>
-            </div>
+                        </div>
 
-            <h2 className="text-xl font-bold mb-4 border-b border-border pb-2">{d.about}</h2>
-            <p className="text-muted-foreground leading-relaxed mb-8 text-lg">
-              {event.description}
-            </p>
+                        <h2 className="text-xl font-bold mb-4 border-b border-border pb-2">{d.about}</h2>
+                        <p className="text-muted-foreground leading-relaxed mb-8 text-lg whitespace-pre-wrap">
+                            {event.description || 'No description provided.'}
+                        </p>
 
-            <div className="p-6 bg-card rounded-radius-2xl border border-border">
-              <h3 className="font-bold mb-2">{d.location}</h3>
-              <p className="text-muted-foreground">{event.location}</p>
-              <p className="text-xs mt-2 text-muted-foreground italic">
-                {d.dateTime} {formatDateTime(event.start_date)}
-              </p>
-            </div>
-          </div>
+                        <div className="p-6 bg-card rounded-radius-2xl border border-border">
+                            <h3 className="font-bold mb-2">{d.location}</h3>
+                            <p className="text-muted-foreground">{event.location || 'Location TBD'}</p>
+                            <p className="text-xs mt-2 text-muted-foreground italic font-medium">
+                                {d.dateTime} {formatDateTime(event.start_date)}
+                            </p>
+                        </div>
+                    </div>
 
-          <div className="relative">
-            <div className="sticky top-24 p-8 bg-card border border-border rounded-radius-4xl shadow-2xl text-center">
-              <p className="text-sm text-muted-foreground uppercase font-bold mb-2">{d.entryFee}</p>
-              <p className="text-4xl font-black mb-6">
-                {parseFloat(event.price) === 0 ? d.free : `${event.price}€`}
-              </p>
+                    <div className="relative">
+                        <div className="sticky top-24 p-8 bg-card border border-border rounded-radius-4xl shadow-xl text-center">
+                            <p className="text-sm text-muted-foreground uppercase font-bold mb-2">{d.entryFee}</p>
+                            <p className="text-4xl font-black mb-6">
+                                {displayPrice === 0 ? d.free : `${displayPrice}€`}
+                            </p>
 
-              {user ? (
-                <button
-                  onClick={handleBooking}
-                  disabled={bookingLoading || event.capacity <= 0}
-                  className="w-full bg-primary text-primary-foreground py-4 rounded-radius-2xl font-bold hover:opacity-90 transition shadow-lg shadow-primary/30 active:scale-[0.98] disabled:opacity-50 disabled:shadow-none"
-                >
-                  {bookingLoading ? d.processing : event.capacity > 0 ? d.reserve : d.soldOut}
-                </button>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-xs text-destructive/80 italic font-bold">
-                    {d.loginRequired}
-                  </p>
-                  <button
-                    onClick={() => router.push('/login')}
-                    className="w-full bg-secondary text-foreground py-4 rounded-radius-2xl font-bold hover:bg-border transition active:scale-95"
-                  >
-                    {d.loginBtn}
-                  </button>
+                            {user ? (
+                                <button
+                                    onClick={handleBooking}
+                                    disabled={bookingLoading || event.capacity <= 0}
+                                    className="w-full bg-primary text-primary-foreground py-4 rounded-radius-2xl font-bold hover:opacity-90 transition shadow-lg shadow-primary/30 active:scale-[0.98] disabled:opacity-50 disabled:shadow-none"
+                                >
+                                    {bookingLoading ? d.processing : event.capacity > 0 ? d.reserve : d.soldOut}
+                                </button>
+                            ) : (
+                                <div className="space-y-4">
+                                    <p className="text-xs text-destructive/80 italic font-bold">
+                                        {d.loginRequired}
+                                    </p>
+                                    <button
+                                        onClick={() => router.push('/login')}
+                                        className="w-full bg-secondary text-foreground py-4 rounded-radius-2xl font-bold hover:bg-border transition active:scale-95"
+                                    >
+                                        {d.loginBtn}
+                                    </button>
+                                </div>
+                            )}
+
+                            <div className="mt-6 pt-6 border-t border-border space-y-3">
+                                {message && (
+                                    <p className={`text-center text-sm font-bold p-3 rounded-radius-xl ${
+                                        message === d.successMsg
+                                            ? 'text-green-600 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                                            : 'text-destructive bg-destructive/10 border border-destructive/20'
+                                    }`}>
+                                        {message}
+                                    </p>
+                                )}
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-muted-foreground">{d.spotsLeft}</span>
+                                    <span className="font-bold text-primary text-sm">{event.capacity ?? 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              )}
+            </main>
 
-              <div className="mt-6 pt-6 border-t border-border space-y-3">
-                  {message && (
-                    <p className={`text-center text-sm font-bold p-2 rounded ${
-                      message === d.successMsg 
-                        ? 'text-green-600 bg-green-50 border border-green-200' 
-                        : 'text-destructive bg-destructive/10'          
-                    }`}>
-                      {message}
-                    </p>
-                  )}
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{d.spotsLeft}</span>
-                  <span className="font-bold text-primary">{event.capacity}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+            <Footer />
         </div>
-      </main>
-
-      <Footer />
-    </div>
-  );
+    );
 }
