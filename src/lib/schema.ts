@@ -5,6 +5,9 @@ import { relations } from 'drizzle-orm';
 export const roleEnum = pgEnum('role', ['attendee', 'organizer', 'admin']);
 export const statusEnum = pgEnum('status', ['confirmed', 'cancelled', 'waitlist']);
 
+// All these things bellow are object declaration to be stored inside the database,
+// They need to be there to make sure that the data in the database are in the right format.
+
 // Table Users
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),

@@ -7,7 +7,7 @@ import React, {
     useState,
 } from 'react';
 
-export type Theme = 'light' | 'dark' | 'pinklight' | 'pinkdark' | 'green' | 'cookiesclick' | 'school' | 'league' | 'cyber';
+export type Theme = 'light' | 'dark' | 'pinklight' | 'pinkdark' | 'green' | 'cookiesclick' | 'school' | 'league' | 'cyber' | 'teams';
 
 export const THEME_OPTIONS: Array<{ value: Theme; label: string }> = [
     {value: 'light', label: 'Clair'},
@@ -19,6 +19,7 @@ export const THEME_OPTIONS: Array<{ value: Theme; label: string }> = [
     {value: 'school', label: 'Isep'},
     {value: 'league', label: 'League'},
     {value: 'cyber', label: 'Cyber'},
+    {value: 'teams', label: 'Teams'},
 ];
 
 type ThemeContextValue = {
@@ -29,7 +30,7 @@ type ThemeContextValue = {
 };
 
 const STORAGE_KEY = 'smart-event-theme';
-const ROOT_THEME_CLASSES = ['dark', 'pink-light', 'pink-dark', 'green', 'cookiesclick', 'school', 'league', 'cyber'];
+const ROOT_THEME_CLASSES = ['dark', 'pink-light', 'pink-dark', 'green', 'cookiesclick', 'school', 'league', 'cyber', 'teams'];
 
 const ROOT_CLASS_BY_THEME: Record<Theme, string | null> = {
     light: null,
@@ -41,6 +42,7 @@ const ROOT_CLASS_BY_THEME: Record<Theme, string | null> = {
     school: 'school',
     league: 'league',
     cyber: 'cyber',
+    teams: 'teams',
 };
 
 const COLOR_SCHEME_BY_THEME: Record<Theme, 'light' | 'dark'> = {
@@ -53,6 +55,7 @@ const COLOR_SCHEME_BY_THEME: Record<Theme, 'light' | 'dark'> = {
     school: 'light',
     league: 'dark',
     cyber: 'dark',
+    teams: 'dark',
 };
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
