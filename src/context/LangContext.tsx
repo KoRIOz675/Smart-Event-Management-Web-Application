@@ -2,6 +2,13 @@ import React, { createContext, useContext, useState } from 'react';
 
 const translations = {
   en: {
+      pushSubTitle: "Push Notifications",
+      pushSubDesc: "Receive instant notifications for successful bookings and event updates directly on your device!",
+      pushSubBtn: "Subscribe to Push 🔔",
+      pushSubBtnLoading: "Processing...",
+      pushSubBtnDone: "Notifications Enabled ✓",
+      pushSubSuccess: "Successfully subscribed to push notifications!",
+      pushSubError: "Subscription failed. Notifications might be blocked in your browser.",
     notifBookingConfirmed: "Your booking has been successfully confirmed!",
     notifEventUpdated: "The event \"{{title}}\" was updated by the organizer.",
     noNotifications: "No new notifications",
@@ -225,6 +232,13 @@ createEvent: {
 },
   },
   fr: {
+      pushSubTitle: "Notifications Push",
+      pushSubDesc: "Recevez des notifications instantanées pour les réservations réussies et les mises à jour d'événements directement sur votre appareil !",
+      pushSubBtn: "S'abonner aux Push 🔔",
+      pushSubBtnLoading: "Traitement en cours...",
+      pushSubBtnDone: "Notifications Activées ✓",
+      pushSubSuccess: "Abonnement aux notifications push réussi !",
+      pushSubError: "L'abonnement a échoué. Les notifications sont peut-être bloquées dans votre navigateur.",
     notifBookingConfirmed: "Votre réservation a été confirmée avec succès !",
     notifEventUpdated: "L'événement \"{{title}}\" a été mis à jour par l'organisateur.",
     noNotifications: "Aucune nouvelle notification",

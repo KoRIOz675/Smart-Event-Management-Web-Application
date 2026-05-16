@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { useLang } from '@/context/LangContext';
 import { THEME_OPTIONS, useTheme } from '@/components/theme-provider';
+
+function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
 
 export default function SettingsPage() {
     const { user, loading: authLoading } = useAuth();
@@ -19,10 +30,55 @@ export default function SettingsPage() {
         ticketUpdates: true,
     });
 
+    // Push notification state
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [isPushLoading, setIsPushLoading] = useState(false);
+
+    useEffect(() => {
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            navigator.serviceWorker.register('/sw.js').then(swReg => {
+                swReg.pushManager.getSubscription().then(sub => {
+                    if (sub) setIsSubscribed(true);
+                });
+            });
+        }
+    }, []);
+
     const handleThemeChange = (value: string) => {
         const selectedTheme = THEME_OPTIONS.find((option) => option.value === value)?.value;
         if (selectedTheme) setTheme(selectedTheme);
     };
+
+    const subscribeUser = async () => {
+        if (!user) return alert(t.loginRequired || 'Please log in!');
+        setIsPushLoading(true);
+
+        try {
+            const swRegistration = await navigator.serviceWorker.ready;
+
+            const subscription = await swRegistration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
+            });
+
+            const res = await fetch('/api/notifications/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id, subscription })
+            });
+
+            if (res.ok) {
+                setIsSubscribed(true);
+                alert(t.pushSubSuccess || 'successful!');
+            }
+        } catch (error) {
+            console.error('error:', error);
+            alert(t.pushSubError || 'unsuccessful, check browser settings.');
+        } finally {
+            setIsPushLoading(false);
+        }
+    };
+
 
     if (authLoading) return <div className="min-h-screen flex items-center justify-center font-black animate-pulse uppercase tracking-widest">{t.ticketsPage?.loading || 'Loading...'}</div>;
     if (!user) return <div className="min-h-screen flex items-center justify-center font-bold">{t.ticketsPage?.loginRequired || 'Please log in.'}</div>;
@@ -149,47 +205,42 @@ export default function SettingsPage() {
 
                         {/* NOTIFICATIONS TAB */}
                         {activeTab === 'notifications' && (
-                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
                                 <h2 className="text-xl font-black uppercase tracking-tight border-b border-border pb-4">Notification Settings</h2>
 
+                                {/* notifications ALERTS */}
+                                <div className="p-6 bg-secondary/30 rounded-radius-2xl border border-primary/20">
+                                    <h3 className="font-black text-lg mb-2">{t.pushSubTitle || 'Push Notifications'}</h3>
+                                    <p className="text-sm text-muted-foreground mb-6">
+                                        {t.pushSubDesc || 'Receive instant notifications for successful bookings and event updates directly on your device!'}
+                                    </p>
+
+                                    <button
+                                        onClick={subscribeUser}
+                                        disabled={isSubscribed || isPushLoading}
+                                        className={`px-6 py-3 rounded-radius-xl text-sm font-bold shadow-md transition-all ${
+                                            isSubscribed
+                                                ? 'bg-emerald-500/10 text-emerald-600 cursor-not-allowed border border-emerald-500/20'
+                                                : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                                        }`}
+                                    >
+                                        {isPushLoading
+                                            ? (t.pushSubBtnLoading || 'Processing...')
+                                            : isSubscribed
+                                                ? (t.pushSubBtnDone || 'Notifications Enabled ✓')
+                                                : (t.pushSubBtn || 'Subscribe to Push 🔔')
+                                        }
+                                    </button>
+                                </div>
+
+                                {/* EMAIL ALERTS */}
                                 <div className="space-y-4">
                                     <label className="flex items-center justify-between p-4 rounded-radius-xl border border-border cursor-pointer hover:bg-secondary/50 transition">
                                         <div>
                                             <h3 className="font-bold text-sm">Ticket Updates</h3>
                                             <p className="text-xs text-muted-foreground">Receive emails when your ticket status changes.</p>
                                         </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={notifications.ticketUpdates}
-                                            onChange={(e) => setNotifications({...notifications, ticketUpdates: e.target.checked})}
-                                            className="w-5 h-5 accent-primary cursor-pointer"
-                                        />
-                                    </label>
-
-                                    <label className="flex items-center justify-between p-4 rounded-radius-xl border border-border cursor-pointer hover:bg-secondary/50 transition">
-                                        <div>
-                                            <h3 className="font-bold text-sm">Event Reminders</h3>
-                                            <p className="text-xs text-muted-foreground">Get notified 24 hours before an event starts.</p>
-                                        </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={notifications.emailAlerts}
-                                            onChange={(e) => setNotifications({...notifications, emailAlerts: e.target.checked})}
-                                            className="w-5 h-5 accent-primary cursor-pointer"
-                                        />
-                                    </label>
-
-                                    <label className="flex items-center justify-between p-4 rounded-radius-xl border border-border cursor-pointer hover:bg-secondary/50 transition">
-                                        <div>
-                                            <h3 className="font-bold text-sm">Marketing & Promos</h3>
-                                            <p className="text-xs text-muted-foreground">Receive news and special offers from organizers.</p>
-                                        </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={notifications.marketing}
-                                            onChange={(e) => setNotifications({...notifications, marketing: e.target.checked})}
-                                            className="w-5 h-5 accent-primary cursor-pointer"
-                                        />
+                                        <input type="checkbox" checked={notifications.ticketUpdates} onChange={(e) => setNotifications({...notifications, ticketUpdates: e.target.checked})} className="w-5 h-5 accent-primary cursor-pointer"/>
                                     </label>
                                 </div>
                             </div>
