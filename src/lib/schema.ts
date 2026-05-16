@@ -64,3 +64,12 @@ export const feedbacks = pgTable('feedbacks', {
 }, (t) => ({
   unq: unique().on(t.eventId, t.userId),
 }));
+
+export const notifications = pgTable('notifications', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+    eventId: uuid('event_id').references(() => events.id, { onDelete: 'cascade' }),
+    message: text('message').notNull(),
+    isRead: boolean('is_read').default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});

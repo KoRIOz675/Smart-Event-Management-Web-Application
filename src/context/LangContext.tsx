@@ -2,6 +2,10 @@ import React, { createContext, useContext, useState } from 'react';
 
 const translations = {
   en: {
+    notifBookingConfirmed: "Your booking has been successfully confirmed!",
+    notifEventUpdated: "The event \"{{title}}\" was updated by the organizer.",
+    noNotifications: "No new notifications",
+    notificationsTitle: "Notifications",
     browse: 'Browse',
     organizers: 'Organizers',
     myTickets: 'My Tickets',
@@ -221,6 +225,10 @@ createEvent: {
 },
   },
   fr: {
+    notifBookingConfirmed: "Votre réservation a été confirmée avec succès !",
+    notifEventUpdated: "L'événement \"{{title}}\" a été mis à jour par l'organisateur.",
+    noNotifications: "Aucune nouvelle notification",
+    notificationsTitle: "Notifications",
     browse: 'Parcourir',
     organizers: 'Organisateurs',
     myTickets: 'Mes billets',
