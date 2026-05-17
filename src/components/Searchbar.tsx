@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, FormEvent} from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 type Event = {
     id: string;
@@ -24,6 +25,7 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 export function SearchBar({ t }: Props) {
+    const router = useRouter();
     const [name, setName] = useState('');
     const [location, setLocation] = useState('');
     const [date, setDate] = useState('');
@@ -71,11 +73,24 @@ export function SearchBar({ t }: Props) {
         fetchEvents();
     }, [fetchEvents]);
 
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault();
+        const query: Record<string, string> = {};
+        
+        if (name.trim()) query.name = name.trim();
+        if (location.trim()) query.location = location.trim();
+        if (date) query.date = date;
+
+        router.push({
+            pathname: '/explore',
+            query: query
+        });
+    };
+
     return (
         <div className="max-w-5xl mx-auto px-4 -mt-24 relative z-20">
             {/* Search Inputs */}
-            <div className="bg-card p-3 rounded-radius-4xl shadow-2xl border border-border flex flex-col md:flex-row gap-2">
-                <div className="flex-1 p-4 flex flex-col justify-center border-b md:border-b-0 md:border-r border-border">
+            <form onSubmit={handleSearch} className="bg-card p-3 rounded-radius-4xl shadow-2xl border border-border flex flex-col md:flex-row gap-2">                <div className="flex-1 p-4 flex flex-col justify-center border-b md:border-b-0 md:border-r border-border">
                     <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1 mb-1">{t.searchEvent}</label>
                     <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t.searchEventPlaceholder} className="bg-transparent text-foreground font-semibold focus:outline-none placeholder:text-muted-foreground/50" />
                 </div>
@@ -90,8 +105,8 @@ export function SearchBar({ t }: Props) {
                 <button className="bg-primary text-primary-foreground px-8 py-4 rounded-radius-2xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2">
                     {t.searchBtn}
                 </button>
-            </div>
-
+            </form>
+            
             {/* Results Dropdown */}
             {(loading || hasSearched) && (
                 <div className="mt-4 bg-card border border-border rounded-2xl shadow-xl overflow-hidden">

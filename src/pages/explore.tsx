@@ -2,7 +2,7 @@
     import Head from 'next/head';
     import NavBar from '@/components/NavBar';
     import Footer from '@/components/Footer';
-    import router from 'next/router';
+    import router, { useRouter } from 'next/router';
     import { useLang } from '@/context/LangContext';
 
     interface Event {
@@ -18,13 +18,24 @@
     }
 
     export default function ExplorePage() {
+      const router = useRouter();
       const { t, lang } = useLang();
       const e = t.explore;
 
       const [events, setEvents] = useState<Event[]>([]);
       const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
       const [loading, setLoading] = useState(true);
-      const [searchTerm, setSearchTerm] = useState('');
+
+      // Extract queries from URL to populate initial search state
+      const { name, location, date } = router.query;
+      const [searchTerm, setSearchTerm] = useState((name as string) || '');
+
+      // Populate search term if it arrives via URL on initial load
+      useEffect(() => {
+        if (router.isReady && name) {
+          setSearchTerm(name as string);
+        }
+      }, [router.isReady, name]);
 
       useEffect(() => {
         const fetchEvents = async () => {
@@ -43,12 +54,32 @@
       }, []);
 
       useEffect(() => {
-        const results = events.filter(event =>
-          event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          event.category?.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        let results = events;
+
+        // Filter by Search Term (matches title or category)
+        if (searchTerm) {
+          results = results.filter(event =>
+            event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            event.category?.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+
+        // Filter by Location if present in URL
+        if (location) {
+          results = results.filter(event => 
+            event.location?.toLowerCase().includes((location as string).toLowerCase())
+          );
+        }
+
+        // Filter by Date if present in URL
+        if (date) {
+          results = results.filter(event => 
+            event.start_date.startsWith(date as string)
+          );
+        }
+
         setFilteredEvents(results);
-      }, [searchTerm, events]);
+      }, [searchTerm, events, location, date]);
 
       const formatDate = (date: string) =>
         new Date(date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short' });
