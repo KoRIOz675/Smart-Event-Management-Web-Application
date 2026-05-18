@@ -15,6 +15,7 @@ export const users = pgTable('users', {
   passwordHash: text('password_hash').notNull(),
   fullName: varchar('full_name', { length: 100 }).notNull(),
   role: roleEnum('role').default('attendee'),
+  imageUrl: text('image_url'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 

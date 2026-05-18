@@ -6,6 +6,7 @@ CREATE TABLE users (
     password_hash TEXT NOT NULL,
     full_name VARCHAR(100) NOT NULL,
     role VARCHAR(20) DEFAULT 'attendee' CHECK (role IN ('attendee', 'organizer', 'admin')),
+    image_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
