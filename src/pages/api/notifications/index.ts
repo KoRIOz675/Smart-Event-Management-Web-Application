@@ -8,7 +8,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(405).json({ message: 'Method not allowed' });
     }
 
-    // In a real app, extract userId from session/JWT here
     const { userId } = req.query;
 
     if (!userId || typeof userId !== 'string') {
@@ -24,6 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         return res.status(200).json(userNotifications);
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        console.error("Error in /api/notifications:", error);
+        return res.status(500).json({ message: 'Internal server error', error: String(error) });
     }
 }
