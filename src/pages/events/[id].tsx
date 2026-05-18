@@ -5,6 +5,8 @@ import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { useLang } from '@/context/LangContext';
+import Messages from '@/components/messages';
+import OrganizerConversations from '@/components/OrganizerConversations';
 
 export default function EventDetails() {
     const router = useRouter();
@@ -12,6 +14,7 @@ export default function EventDetails() {
     const { user } = useAuth();
     const { t, lang } = useLang();
     const d = t.eventDetails;
+    const chatTrans = (t as any).chat; // Fallback helper for chat translation block
 
     const [event, setEvent] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -19,16 +22,13 @@ export default function EventDetails() {
     const [message, setMessage] = useState('');
 
     useEffect(() => {
-        // Wait until Next.js router is ready and 'id' exists
         if (!id) return;
 
         fetch(`/api/events/${id}`)
             .then(res => res.json())
             .then(data => {
-                // 1. Check if the API returned an array instead of a single object
                 const eventData = Array.isArray(data) ? data[0] : data;
 
-                // 2. Check if the API returned an error message or empty data
                 if (!eventData || eventData.error || eventData.message) {
                     setMessage(d.notFound);
                     setEvent(null);
@@ -64,7 +64,7 @@ export default function EventDetails() {
 
             if (res.ok) {
                 setMessage(d.successMsg);
-                setTimeout(() => router.push('/profile'), 2000); // Updated redirect to /profile
+                setTimeout(() => router.push('/profile'), 2000);
             } else {
                 setMessage(data.message || d.bookingError);
             }
@@ -76,7 +76,7 @@ export default function EventDetails() {
     };
 
     const formatDateTime = (dateString: string) => {
-        if (!dateString) return 'TBD'; // Safe fallback for missing dates
+        if (!dateString) return 'TBD';
         return new Date(dateString).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB', {
             weekday: 'long',
             year: 'numeric',
@@ -101,11 +101,11 @@ export default function EventDetails() {
         </div>
     );
 
-    // Safe fallback variables in case database column names differ slightly
     const displayTitle = event.title || event.event_title || 'Untitled Event';
     const displayCategory = event.category || 'General';
     const displayOrganizer = event.organizer_name || 'SmartEvent Organizer';
     const displayPrice = parseFloat(event.price || 0);
+    const organizerId = event.organizerId ?? event.organizer_id ?? null;
 
     return (
         <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
@@ -121,17 +121,16 @@ export default function EventDetails() {
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-12">
-
                     <div className="md:col-span-2">
                         <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">{displayTitle}</h1>
 
                         <div className="flex flex-wrap items-center gap-4 mb-8">
-              <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase">
-                {displayCategory}
-              </span>
+                            <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase">
+                                {displayCategory}
+                            </span>
                             <span className="text-muted-foreground text-sm italic">
-                {d.organizedBy} <span className="text-foreground font-bold">{displayOrganizer}</span>
-              </span>
+                                {d.organizedBy} <span className="text-foreground font-bold">{displayOrganizer}</span>
+                            </span>
                         </div>
 
                         <h2 className="text-xl font-bold mb-4 border-b border-border pb-2">{d.about}</h2>
@@ -143,9 +142,36 @@ export default function EventDetails() {
                             <h3 className="font-bold mb-2">{d.location}</h3>
                             <p className="text-muted-foreground">{event.location || 'Location TBD'}</p>
                             <p className="text-xs mt-2 text-muted-foreground italic font-medium">
-                                {d.dateTime} {formatDateTime(event.start_date)}
+                                {d.dateTime} {formatDateTime(event.startDate ?? event.start_date)}
                             </p>
                         </div>
+
+                        {/* Attendee Messaging View */}
+                        {user && organizerId && organizerId !== user.id && (
+                            <div className="mt-8">
+                                <h2 className="text-xl font-bold mb-4 border-b border-border pb-2">
+                                    {chatTrans?.contactOrganizer || (lang === 'fr' ? "Contacter l'organisateur" : "Contact Organizer")}
+                                </h2>
+                                <Messages
+                                    eventId={id as string}
+                                    currentUserId={user.id}
+                                    targetUserId={organizerId}
+                                />
+                            </div>
+                        )}
+
+                        {/* Organizer Messaging View */}
+                        {user && organizerId === user.id && (
+                            <div className="mt-8">
+                                <h2 className="text-xl font-bold mb-4 border-b border-border pb-2">
+                                    {chatTrans?.attendeeMessages || (lang === 'fr' ? "Messages des participants" : "Attendee Messages")}
+                                </h2>
+                                <OrganizerConversations
+                                    eventId={id as string}
+                                    organizerId={user.id}
+                                />
+                            </div>
+                        )}
                     </div>
 
                     <div className="relative">

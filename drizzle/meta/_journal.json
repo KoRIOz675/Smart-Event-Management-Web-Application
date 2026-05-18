@@ -19,8 +19,15 @@
     {
       "idx": 2,
       "version": "7",
-      "when": 1779086935764,
-      "tag": "0002_yellow_apocalypse",
+      "when": 1779094932661,
+      "tag": "0002_mature_power_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779097181574,
+      "tag": "0003_aberrant_elektra",
       "breakpoints": true
     },
     {

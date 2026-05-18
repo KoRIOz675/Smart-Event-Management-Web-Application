@@ -133,6 +133,16 @@ eventDetails: {
   networkError: 'Network error during booking attempt.',
   loadError: 'Loading error: Event not found.',
 },
+      chat: {
+          title: 'Messages',
+          noConversations: 'No conversations yet.',
+          typePlaceholder: 'Type a message...',
+          sendBtn: 'Send',
+          backToConversations: '← Back to list',
+          loading: 'Loading messages...',
+          selectConversation: 'Select a conversation to start messaging',
+          contextEvent: 'Regarding event:'
+      },
 footer: {
   tagline: '"Making every event memorable through simplified and intelligent management."',
   platformTitle: 'Platform',
@@ -266,6 +276,17 @@ createEvent: {
     solutionDesc: 'Tout ce dont vous avez besoin pour réussir votre projet événementiel.',
     organizersTitle: 'Pour les Organisateurs',
     admin: 'Admin',
+
+      chat: {
+          title: 'Messages',
+          noConversations: 'Aucune conversation pour le moment.',
+          typePlaceholder: 'Écrivez un message...',
+          sendBtn: 'Envoyer',
+          backToConversations: '← Retour à la liste',
+          loading: 'Chargement des messages...',
+          selectConversation: 'Sélectionnez une conversation pour commencer',
+          contextEvent: 'À propos de l’événement :'
+      },
     organizersFeatures: [
       "Création d'événements multi-tickets",
       'Dashboard analytique en temps réel',
