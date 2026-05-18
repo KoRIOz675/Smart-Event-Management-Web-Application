@@ -32,3 +32,5 @@ Thumbs.db
 Dockerfile
 docker-compose.yml
 .dockerignore
+
+Smart-Event-Management-Web-Application_context.txt
