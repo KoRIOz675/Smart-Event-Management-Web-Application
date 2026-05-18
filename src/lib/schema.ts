@@ -5,12 +5,13 @@ export const roleEnum = pgEnum('role', ['attendee', 'organizer', 'admin']);
 export const statusEnum = pgEnum('status', ['confirmed', 'cancelled', 'waitlist']);
 
 export const users = pgTable('users', {
-    id: uuid('id').primaryKey().defaultRandom(),
-    email: varchar('email', { length: 255 }).unique().notNull(),
-    passwordHash: text('password_hash').notNull(),
-    fullName: varchar('full_name', { length: 100 }).notNull(),
-    role: roleEnum('role').default('attendee'),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  email: varchar('email', { length: 255 }).unique().notNull(),
+  passwordHash: text('password_hash').notNull(),
+  fullName: varchar('full_name', { length: 100 }).notNull(),
+  role: roleEnum('role').default('attendee'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  imageUrl: text('image_url'),
 });
 
 export const events = pgTable('events', {

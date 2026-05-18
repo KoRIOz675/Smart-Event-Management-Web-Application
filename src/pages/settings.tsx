@@ -18,7 +18,7 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export default function SettingsPage() {
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, updateUser } = useAuth();
     const { lang, toggleLang, t } = useLang();
     const { theme, mounted, setTheme } = useTheme();
 
@@ -33,6 +33,39 @@ export default function SettingsPage() {
     // Push notification state
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [isPushLoading, setIsPushLoading] = useState(false);
+    // Avatar upload state
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.imageUrl || null);
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !user) return;
+        setUploading(true);
+
+        const ext = file.name.split('.').pop();
+        const base64 = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve((reader.result as string).split(',')[1]);
+            reader.readAsDataURL(file);
+        });
+
+        const res = await fetch('/api/user/upload-avatar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: user.id, base64, ext }),
+        });
+
+        if (res.ok) {
+            const { imageUrl } = await res.json();
+            // 👇 Force the browser to bypass the cache by adding a timestamp
+            const cacheBustedUrl = `${imageUrl}?t=${Date.now()}`;
+
+            setAvatarUrl(cacheBustedUrl);
+            updateUser({ imageUrl: cacheBustedUrl });
+        }
+        setUploading(false);
+    };
 
     useEffect(() => {
         if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -135,12 +168,29 @@ export default function SettingsPage() {
                                 <h2 className="text-xl font-black uppercase tracking-tight border-b border-border pb-4">Profile Details</h2>
 
                                 <div className="flex items-center gap-6">
-                                    <div className="w-20 h-20 bg-primary rounded-radius-2xl flex items-center justify-center text-3xl font-black text-primary-foreground rotate-3 shadow-md">
-                                        {userInitial}
+                                    <div className="w-20 h-20 rounded-radius-2xl overflow-hidden shadow-md rotate-3 bg-primary">
+                                        {avatarUrl ? (
+                                            <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-3xl font-black text-primary-foreground">
+                                                {userInitial}
+                                            </div>
+                                        )}
                                     </div>
                                     <div>
-                                        <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded-radius-lg text-xs font-bold hover:bg-primary hover:text-primary-foreground transition">
-                                            Change Avatar
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleAvatarChange}
+                                        />
+                                        <button
+                                            onClick={() => fileInputRef.current?.click()}
+                                            disabled={uploading}
+                                            className="px-4 py-2 bg-secondary text-secondary-foreground rounded-radius-lg text-xs font-bold hover:bg-primary hover:text-primary-foreground transition disabled:opacity-50"
+                                        >
+                                            {uploading ? 'Uploading...' : 'Change Avatar'}
                                         </button>
                                     </div>
                                 </div>

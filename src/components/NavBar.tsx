@@ -167,9 +167,13 @@ const NavBar = () => {
 
                                 <Link
                                     href="/profile"
-                                    className="w-10 h-10 bg-primary rounded-radius-xl flex items-center justify-center text-xl font-black text-primary-foreground shadow-md rotate-3 hover:rotate-6 hover:scale-105 transition-all"
+                                    className="w-10 h-10 bg-primary rounded-radius-xl flex items-center justify-center text-xl font-black text-primary-foreground shadow-md rotate-3 hover:rotate-6 hover:scale-105 transition-all overflow-hidden"
                                 >
-                                    {userInitial}
+                                    {user?.imageUrl ? (
+                                        <img src={user.imageUrl} alt="Avatar" className="w-full h-full object-cover -rotate-3" />
+                                    ) : (
+                                        userInitial
+                                    )}
                                 </Link>
                                 <button
                                     onClick={logout}

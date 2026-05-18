@@ -5,11 +5,13 @@ interface User {
   full_name: string;
   email: string;
   role: string;
+  imageUrl?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (userData: User) => void;
+  updateUser: (data: Partial<User>) => void;
   logout: () => void;
   loading: boolean;
 }
@@ -29,6 +31,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   }, []);
 
+  const updateUser = (data: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...data };
+      setUser(updatedUser);
+      localStorage.setItem('smart_event_user', JSON.stringify(updatedUser));
+    }
+  };
+
   const login = (userData: User) => {
     setUser(userData);
     localStorage.setItem('smart_event_user', JSON.stringify(userData));
@@ -41,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser, loading }}>
       {children}
     </AuthContext.Provider>
   );
