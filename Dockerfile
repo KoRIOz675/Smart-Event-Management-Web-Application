@@ -8,6 +8,7 @@ RUN npm install
 
 # Stage 2: Development
 FROM node:20-alpine AS dev
+RUN apk add --no-cache libc6-compat postgresql-client
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
