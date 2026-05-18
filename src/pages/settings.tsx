@@ -58,8 +58,11 @@ export default function SettingsPage() {
 
         if (res.ok) {
             const { imageUrl } = await res.json();
-            setAvatarUrl(imageUrl); // Updates the image just on the settings page
-            updateUser({ imageUrl }); // 👇 THIS IS THE NEW LINE: It saves the image globally and in localStorage!
+            // 👇 Force the browser to bypass the cache by adding a timestamp
+            const cacheBustedUrl = `${imageUrl}?t=${Date.now()}`;
+
+            setAvatarUrl(cacheBustedUrl);
+            updateUser({ imageUrl: cacheBustedUrl });
         }
         setUploading(false);
     };
