@@ -18,7 +18,7 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export default function SettingsPage() {
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, updateUser } = useAuth();
     const { lang, toggleLang, t } = useLang();
     const { theme, mounted, setTheme } = useTheme();
 
@@ -58,7 +58,8 @@ export default function SettingsPage() {
 
         if (res.ok) {
             const { imageUrl } = await res.json();
-            setAvatarUrl(imageUrl);
+            setAvatarUrl(imageUrl); // Updates the image just on the settings page
+            updateUser({ imageUrl }); // 👇 THIS IS THE NEW LINE: It saves the image globally and in localStorage!
         }
         setUploading(false);
     };
