@@ -57,12 +57,22 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
 
                     {/* User Basic Info */}
-                    <div className="w-24 h-24 bg-primary rounded-radius-3xl flex items-center justify-center text-3xl font-black text-primary-foreground mb-4 shadow-xl rotate-3 overflow-hidden">
-                        {user.imageUrl ? (
-                            <img src={user.imageUrl} alt="Avatar" className="w-full h-full object-cover -rotate-3" />
-                        ) : (
-                            user.fullName?.charAt(0)
-                        )}
+                    {/* User Basic Info */}
+                    <div className="lg:col-span-1 bg-card border border-border p-8 rounded-radius-4xl flex flex-col items-center text-center">
+                        <div className="w-24 h-24 bg-primary rounded-radius-3xl flex items-center justify-center text-3xl font-black text-primary-foreground mb-4 shadow-xl rotate-3 overflow-hidden">
+                            {user.imageUrl ? (
+                                <img src={user.imageUrl} alt="Avatar" className="w-full h-full object-cover -rotate-3" />
+                            ) : (
+                                user.fullName?.charAt(0)
+                            )}
+                        </div>
+                        <h1 className="text-2xl font-black tracking-tighter">{user.fullName}</h1>
+                        <p className="text-muted-foreground text-sm mb-6">{user.email}</p>
+                        <Link
+                            href={`/settings`}
+                            className="w-full py-3 bg-secondary text-secondary-foreground rounded-radius-xl text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all">
+                            {m.editProfile}
+                        </Link>
                     </div>
 
                     {/* Fun Stats Cards */}
