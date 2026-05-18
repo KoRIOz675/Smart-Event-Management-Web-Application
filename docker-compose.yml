@@ -2,7 +2,6 @@ services:
   db:
     image: postgres:16-alpine
     container_name: smart_event_db_dev
-    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -19,11 +18,11 @@ services:
       retries: 5
 
   web:
+    command: ["sh", "./init.sh"]
     build:
       context: .
       target: dev
     container_name: smart_event_app_dev
-    restart: always
     ports:
       - "3000:3000"
       - "4983:4983"
