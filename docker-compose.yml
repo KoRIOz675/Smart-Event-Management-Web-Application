@@ -6,26 +6,23 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./migration:/docker-entrypoint-initdb.d
+    networks:
+      - kkv-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  web:
+  isep: # Átnevezve web-ről isep-re
     command: ["sh", "./init.sh"]
     build:
       context: .
       target: dev
-    container_name: smart_event_app_dev
-    ports:
-      - "3000:3000"
-      - "4983:4983"
+    container_name: isep # A konténer neve is isep lett
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     volumes:
@@ -34,6 +31,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - kkv-network # Összekötve a közös hálózattal
 
 volumes:
   postgres_data:
+
+networks:
+  kkv-network:
+    external: true
