@@ -12,19 +12,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         try {
-            let conditions = or(
+            const senderReceiverMatch = or(
                 and(eq(messages.senderId, userId), eq(messages.receiverId, partnerId)),
                 and(eq(messages.senderId, partnerId), eq(messages.receiverId, userId))
-            );
+            )!;
 
-            if (eventId && typeof eventId === 'string') {
-                conditions = and(conditions, eq(messages.eventId, eventId));
-            }
+            const whereClause = (eventId && typeof eventId === 'string')
+                ? and(senderReceiverMatch, eq(messages.eventId, eventId))
+                : senderReceiverMatch;
 
             const chatHistory = await db
                 .select()
                 .from(messages)
-                .where(conditions)
+                .where(whereClause)
                 .orderBy(asc(messages.createdAt));
 
             return res.status(200).json(chatHistory);

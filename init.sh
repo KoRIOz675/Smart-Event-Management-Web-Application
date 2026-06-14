@@ -3,7 +3,7 @@
 chmod +x ./seed.sh
 
 echo "Lancement du seed..."
-npx drizzle-kit push
+npx drizzle-kit push --force
 ./seed.sh
 
 echo "Lancement du serveur de développement..."

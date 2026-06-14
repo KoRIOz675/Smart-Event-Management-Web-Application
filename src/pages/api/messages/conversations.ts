@@ -12,11 +12,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-        let messageConditions = or(eq(messages.senderId, userId), eq(messages.receiverId, userId));
+        const userMatch = or(eq(messages.senderId, userId), eq(messages.receiverId, userId))!;
 
-        if (eventId && typeof eventId === 'string') {
-            messageConditions = and(messageConditions, eq(messages.eventId, eventId));
-        }
+        const whereClause = (eventId && typeof eventId === 'string')
+            ? and(userMatch, eq(messages.eventId, eventId))
+            : userMatch;
 
         const allUserMessages = await db
             .select({
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 receiverId: messages.receiverId,
             })
             .from(messages)
-            .where(messageConditions);
+            .where(whereClause);
 
         const partnerIds = Array.from(
             new Set(

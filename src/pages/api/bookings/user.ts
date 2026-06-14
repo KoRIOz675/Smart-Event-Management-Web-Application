@@ -16,10 +16,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const userTickets = await db
             .select({
                 id: bookings.id,
-                event_id: events.id, // 👈 ADDED THIS LINE! This is the missing hash!
+                event_id: events.id,
                 event_title: events.title,
                 location: events.location,
                 start_date: events.startDate,
+                end_date: events.endDate,
                 status: bookings.status,
                 ticket_type: ticketTypes.name,
             })

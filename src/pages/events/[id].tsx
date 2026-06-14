@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useLang } from '@/context/LangContext';
 import Messages from '@/components/messages';
 import OrganizerConversations from '@/components/OrganizerConversations';
+import PaymentModal from '@/components/PaymentModal';
 
 interface Feedback {
     id: string;
@@ -26,6 +27,9 @@ export default function EventDetails() {
     const chatTrans = (t as any).chat; // Fallback helper for chat translation block
 
     const fb = (t as any).feedback;
+    const p = (t as any).payment;
+
+    const [showPayment, setShowPayment] = useState(false);
 
     const [event, setEvent] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -121,20 +125,16 @@ export default function EventDetails() {
         }
     };
 
-    const handleBooking = async () => {
-        if (!user) {
-            setMessage(d.loginRedirectMsg);
-            return router.push('/login');
-        }
-
+    const confirmBooking = async () => {
         setBookingLoading(true);
         setMessage('');
+        setShowPayment(false);
 
         try {
             const res = await fetch('/api/bookings/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ event_id: id, user_id: user.id }),
+                body: JSON.stringify({ event_id: id, user_id: user!.id }),
             });
 
             const data = await res.json();
@@ -145,11 +145,25 @@ export default function EventDetails() {
             } else {
                 setMessage(data.message || d.bookingError);
             }
-        } catch (err) {
+        } catch {
             setMessage(d.networkError);
         } finally {
             setBookingLoading(false);
         }
+    };
+
+    const handleBooking = async () => {
+        if (!user) {
+            setMessage(d.loginRedirectMsg);
+            return router.push('/login');
+        }
+
+        if (displayPrice > 0) {
+            setShowPayment(true);
+            return;
+        }
+
+        confirmBooking();
     };
 
     const formatDateTime = (dateString: string) => {
@@ -387,6 +401,16 @@ export default function EventDetails() {
             </main>
 
             <Footer />
+
+            {showPayment && (
+                <PaymentModal
+                    eventTitle={displayTitle}
+                    price={displayPrice}
+                    p={p}
+                    onSuccess={confirmBooking}
+                    onCancel={() => setShowPayment(false)}
+                />
+            )}
         </div>
     );
 }

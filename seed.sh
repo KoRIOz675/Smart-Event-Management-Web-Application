@@ -49,61 +49,61 @@ TRUNCATE feedbacks, bookings, ticket_types, events, users RESTART IDENTITY CASCA
 
 -- ============================================================
 -- 1.  USERS
---     Passwords are bcrypt hashes of "Password1!" (cost 10)
+--     Passwords are bcrypt hashes of "Password1!" (cost 10, bcryptjs)
 -- ============================================================
 INSERT INTO users (id, email, password_hash, full_name, role) VALUES
 
   -- Admin
   ('00000000-0000-0000-0000-000000000001',
    'admin@smartevent.io',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBji',
+   '$2b$10$.RdK1cYNAv/4vmo8nt76G.5f7yTbQKiq9.FDyWNRCJa0a3Lfi66UW',
    'Alice Admin', 'admin'),
 
   -- Organizers
   ('00000000-0000-0000-0000-000000000002',
    'bob.organizer@example.com',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBji',
+   '$2b$10$.RdK1cYNAv/4vmo8nt76G.5f7yTbQKiq9.FDyWNRCJa0a3Lfi66UW',
    'Bob Organizer', 'organizer'),
 
   ('00000000-0000-0000-0000-000000000003',
    'claire.events@example.com',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBji',
+   '$2b$10$.RdK1cYNAv/4vmo8nt76G.5f7yTbQKiq9.FDyWNRCJa0a3Lfi66UW',
    'Claire Dupont', 'organizer'),
 
   ('00000000-0000-0000-0000-000000000004',
    'david.tech@example.com',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBji',
+   '$2b$10$.RdK1cYNAv/4vmo8nt76G.5f7yTbQKiq9.FDyWNRCJa0a3Lfi66UW',
    'David Chen', 'organizer'),
 
   -- Attendees
   ('00000000-0000-0000-0000-000000000010',
    'emma@example.com',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBji',
+   '$2b$10$.RdK1cYNAv/4vmo8nt76G.5f7yTbQKiq9.FDyWNRCJa0a3Lfi66UW',
    'Emma Martin', 'attendee'),
 
   ('00000000-0000-0000-0000-000000000011',
    'franck@example.com',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBji',
+   '$2b$10$.RdK1cYNAv/4vmo8nt76G.5f7yTbQKiq9.FDyWNRCJa0a3Lfi66UW',
    'Franck Morel', 'attendee'),
 
   ('00000000-0000-0000-0000-000000000012',
    'grace@example.com',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBji',
+   '$2b$10$.RdK1cYNAv/4vmo8nt76G.5f7yTbQKiq9.FDyWNRCJa0a3Lfi66UW',
    'Grace Kim', 'attendee'),
 
   ('00000000-0000-0000-0000-000000000013',
    'hugo@example.com',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBji',
+   '$2b$10$.RdK1cYNAv/4vmo8nt76G.5f7yTbQKiq9.FDyWNRCJa0a3Lfi66UW',
    'Hugo Lefevre', 'attendee'),
 
   ('00000000-0000-0000-0000-000000000014',
    'isabelle@example.com',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBji',
+   '$2b$10$.RdK1cYNAv/4vmo8nt76G.5f7yTbQKiq9.FDyWNRCJa0a3Lfi66UW',
    'Isabelle Bernard', 'attendee'),
 
   ('00000000-0000-0000-0000-000000000015',
    'jules@example.com',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lBji',
+   '$2b$10$.RdK1cYNAv/4vmo8nt76G.5f7yTbQKiq9.FDyWNRCJa0a3Lfi66UW',
    'Jules Petit', 'attendee');
 
 -- ============================================================
