@@ -8,6 +8,15 @@ import { useLang } from '@/context/LangContext';
 import Messages from '@/components/messages';
 import OrganizerConversations from '@/components/OrganizerConversations';
 
+interface Feedback {
+    id: string;
+    rating: number;
+    comment: string | null;
+    createdAt: string;
+    userId: string;
+    userName: string;
+}
+
 export default function EventDetails() {
     const router = useRouter();
     const { id } = router.query;
@@ -16,10 +25,20 @@ export default function EventDetails() {
     const d = t.eventDetails;
     const chatTrans = (t as any).chat; // Fallback helper for chat translation block
 
+    const fb = (t as any).feedback;
+
     const [event, setEvent] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [bookingLoading, setBookingLoading] = useState(false);
     const [message, setMessage] = useState('');
+
+    const [feedbackList, setFeedbackList] = useState<Feedback[]>([]);
+    const [userRating, setUserRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
+    const [userComment, setUserComment] = useState('');
+    const [feedbackMsg, setFeedbackMsg] = useState('');
+    const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+    const [alreadyReviewed, setAlreadyReviewed] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -43,6 +62,64 @@ export default function EventDetails() {
                 setLoading(false);
             });
     }, [id, d.notFound, d.loadError]);
+
+    useEffect(() => {
+        if (!id) return;
+        fetch(`/api/feedbacks/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setFeedbackList(data);
+                    if (user) {
+                        setAlreadyReviewed(data.some((f: Feedback) => f.userId === user.id));
+                    }
+                }
+            })
+            .catch(() => {});
+    }, [id, user]);
+
+    const handleFeedbackSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user || userRating === 0) return;
+
+        setFeedbackSubmitting(true);
+        setFeedbackMsg('');
+
+        try {
+            const res = await fetch('/api/feedbacks/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    event_id: id,
+                    user_id: user.id,
+                    rating: userRating,
+                    comment: userComment.trim() || null,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setFeedbackMsg(fb?.successMsg || 'Review submitted!');
+                setAlreadyReviewed(true);
+                const newFeedback: Feedback = {
+                    id: Date.now().toString(),
+                    rating: userRating,
+                    comment: userComment.trim() || null,
+                    createdAt: new Date().toISOString(),
+                    userId: user.id,
+                    userName: (user as any).fullName || (user as any).full_name || 'You',
+                };
+                setFeedbackList(prev => [newFeedback, ...prev]);
+            } else {
+                setFeedbackMsg(data.message || fb?.errorMsg || 'Error.');
+            }
+        } catch {
+            setFeedbackMsg(fb?.errorMsg || 'Error.');
+        } finally {
+            setFeedbackSubmitting(false);
+        }
+    };
 
     const handleBooking = async () => {
         if (!user) {
@@ -115,9 +192,17 @@ export default function EventDetails() {
             <NavBar />
 
             <main className="max-w-5xl mx-auto px-4 py-12">
-                <div className="h-64 md:h-96 bg-muted rounded-radius-4xl mb-8 flex items-center justify-center text-8xl shadow-inner border border-border">
-                    {displayCategory.toLowerCase().includes('tech') ? '💻' :
-                        displayCategory.toLowerCase().includes('musi') ? '🎵' : '📅'}
+                <div className="h-64 md:h-96 bg-muted rounded-radius-4xl mb-8 flex items-center justify-center text-8xl shadow-inner border border-border overflow-hidden">
+                    {event.imageUrl || event.image_url ? (
+                        <img
+                            src={event.imageUrl || event.image_url}
+                            alt={displayTitle}
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        displayCategory.toLowerCase().includes('tech') ? '💻' :
+                        displayCategory.toLowerCase().includes('musi') ? '🎵' : '📅'
+                    )}
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-12">
@@ -172,6 +257,84 @@ export default function EventDetails() {
                                 />
                             </div>
                         )}
+
+                        {/* Feedback & Reviews */}
+                        <div className="mt-8">
+                            <div className="flex items-center gap-4 mb-4 border-b border-border pb-2">
+                                <h2 className="text-xl font-bold">{fb?.title || 'Reviews'}</h2>
+                                {feedbackList.length > 0 && (
+                                    <span className="text-sm text-muted-foreground">
+                                        {(feedbackList.reduce((sum, f) => sum + f.rating, 0) / feedbackList.length).toFixed(1)} ★ · {feedbackList.length} {fb?.reviews || 'reviews'}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Submit form */}
+                            {!user ? (
+                                <p className="text-sm text-muted-foreground italic mb-4">{fb?.loginRequired || 'Log in to leave a review.'}</p>
+                            ) : organizerId === user.id ? null : alreadyReviewed ? (
+                                <p className="text-sm text-green-600 dark:text-green-400 font-medium mb-4">{fb?.alreadyReviewed || 'You have already reviewed this event.'}</p>
+                            ) : (
+                                <form onSubmit={handleFeedbackSubmit} className="mb-6 p-4 bg-card border border-border rounded-radius-2xl space-y-3">
+                                    <p className="font-semibold text-sm">{fb?.yourReview || 'Leave a review'}</p>
+                                    <div className="flex gap-1">
+                                        {[1, 2, 3, 4, 5].map(star => (
+                                            <button
+                                                key={star}
+                                                type="button"
+                                                onClick={() => setUserRating(star)}
+                                                onMouseEnter={() => setHoverRating(star)}
+                                                onMouseLeave={() => setHoverRating(0)}
+                                                className="text-2xl transition-transform hover:scale-110 focus:outline-none"
+                                            >
+                                                <span className={(hoverRating || userRating) >= star ? 'text-yellow-400' : 'text-muted-foreground/30'}>★</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <textarea
+                                        value={userComment}
+                                        onChange={e => setUserComment(e.target.value)}
+                                        placeholder={fb?.commentPlaceholder || 'Share your experience (optional)...'}
+                                        rows={3}
+                                        className="w-full px-3 py-2 bg-background border border-border rounded-radius-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                    />
+                                    {feedbackMsg && (
+                                        <p className={`text-sm font-medium ${feedbackMsg === (fb?.successMsg || 'Review submitted!') ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+                                            {feedbackMsg}
+                                        </p>
+                                    )}
+                                    <button
+                                        type="submit"
+                                        disabled={feedbackSubmitting || userRating === 0}
+                                        className="px-5 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-radius-xl hover:opacity-90 transition disabled:opacity-50"
+                                    >
+                                        {feedbackSubmitting ? (fb?.submitting || 'Submitting...') : (fb?.submit || 'Submit review')}
+                                    </button>
+                                </form>
+                            )}
+
+                            {/* Reviews list */}
+                            {feedbackList.length === 0 ? (
+                                <p className="text-sm text-muted-foreground italic">{fb?.noReviews || 'No reviews yet. Be the first!'}</p>
+                            ) : (
+                                <div className="space-y-3">
+                                    {feedbackList.map(feedback => (
+                                        <div key={feedback.id} className="p-4 bg-card border border-border rounded-radius-2xl">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="font-semibold text-sm">{feedback.userName}</span>
+                                                <span className="text-yellow-400 text-sm">{'★'.repeat(feedback.rating)}{'☆'.repeat(5 - feedback.rating)}</span>
+                                            </div>
+                                            {feedback.comment && (
+                                                <p className="text-sm text-muted-foreground">{feedback.comment}</p>
+                                            )}
+                                            <p className="text-xs text-muted-foreground/60 mt-1">
+                                                {new Date(feedback.createdAt).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB')}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="relative">

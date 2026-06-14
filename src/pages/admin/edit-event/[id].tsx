@@ -13,6 +13,8 @@ export default function EditEvent() {
   const [eventData, setEventData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const formatDateForInput = (dateStr: string) => {
     if (!dateStr) return "";
@@ -36,6 +38,9 @@ export default function EditEvent() {
         end_date: formatDateForInput(data.endDate || data.end_date),
         ticket_types: data.ticket_types || [{ name: 'Standard', price: 0, quantity_available: data.capacity }]
       });
+      if (data.imageUrl || data.image_url) {
+        setImagePreview(data.imageUrl || data.image_url);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -61,14 +66,40 @@ export default function EditEvent() {
     }));
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    let imageUrl = eventData.imageUrl || eventData.image_url || null;
+    if (imageFile) {
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(imageFile);
+      });
+      const uploadRes = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64 }),
+      });
+      if (uploadRes.ok) {
+        const uploadData = await uploadRes.json();
+        imageUrl = uploadData.url;
+      }
+    }
+
     try {
       const res = await fetch('/api/admin/events/update', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(eventData),
+        body: JSON.stringify({ ...eventData, image_url: imageUrl }),
       });
       if (res.ok) {
         alert("Événement mis à jour avec succès !");
@@ -109,6 +140,27 @@ export default function EditEvent() {
               value={eventData.description} onChange={handleChange}
               className="w-full p-4 rounded-radius-2xl bg-input border border-border focus:ring-2 focus:ring-primary outline-none"
             />
+            <div>
+              <label className="text-xs font-bold text-muted-foreground mb-2 block">Image de couverture</label>
+              <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-border rounded-radius-2xl cursor-pointer hover:border-primary/60 transition overflow-hidden relative bg-input">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="preview" className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <span className="text-3xl">🖼️</span>
+                    <span className="text-sm font-medium">Cliquer pour changer (max 5 Mo)</span>
+                  </div>
+                )}
+                <input type="file" accept="image/*" className="sr-only" onChange={handleImageChange} />
+              </label>
+              {imagePreview && (
+                <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); setEventData((p: any) => ({ ...p, imageUrl: null, image_url: null })); }}
+                  className="mt-2 text-xs text-destructive hover:underline">
+                  Supprimer l'image
+                </button>
+              )}
+            </div>
+
             <div className="grid sm:grid-cols-2 gap-4">
               <input
                 type="text" name="location" placeholder="Lieu ou URL" required
