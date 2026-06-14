@@ -7,17 +7,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).end();
   }
 
-  const {
-    organizer_id,
-    title,
-    description,
-    location,
-    start_date,
-    end_date,
-    category,
-    capacity,
-    ticket_types,
-    image_url,
+  const { 
+    organizer_id, 
+    title, 
+    description, 
+    location, 
+    start_date, 
+    end_date, 
+    category, 
+    capacity, 
+    ticket_types 
   } = req.body;
 
   try {
@@ -28,11 +27,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         title,
         description,
         location,
-        startDate: new Date(start_date),
-        endDate: new Date(end_date),
+        startDate: new Date(start_date), 
+        endDate: new Date(end_date),     
         capacity: parseInt(capacity),
         category,
-        imageUrl: image_url || null,
       }).returning({ id: events.id });
 
       const eventId = insertedEvent.id;

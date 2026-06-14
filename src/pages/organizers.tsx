@@ -41,8 +41,6 @@ export default function CreateEvent() {
   });
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -68,13 +66,6 @@ export default function CreateEvent() {
     setEventData(prev => ({ ...prev, ticket_types: newTickets }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage(null);
@@ -92,29 +83,11 @@ export default function CreateEvent() {
       return;
     }
 
-    let imageUrl: string | null = null;
-    if (imageFile) {
-      const base64 = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.readAsDataURL(imageFile);
-      });
-      const uploadRes = await fetch('/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: base64 }),
-      });
-      if (uploadRes.ok) {
-        const uploadData = await uploadRes.json();
-        imageUrl = uploadData.url;
-      }
-    }
-
     try {
       const res = await fetch('/api/events/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...eventData, organizer_id: user.id, image_url: imageUrl }),
+        body: JSON.stringify({ ...eventData, organizer_id: user.id }),
       });
 
       const data = await res.json();
@@ -172,29 +145,6 @@ export default function CreateEvent() {
               value={eventData.description} onChange={handleChange}
               className="w-full p-4 rounded-radius-2xl bg-input border border-border focus:ring-2 focus:ring-primary outline-none"
             />
-
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground mb-2 block">
-                {(c as any).coverImage || 'Cover Image'}
-              </label>
-              <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-border rounded-radius-2xl cursor-pointer hover:border-primary/60 transition overflow-hidden relative bg-input">
-                {imagePreview ? (
-                  <img src={imagePreview} alt="preview" className="absolute inset-0 w-full h-full object-cover" />
-                ) : (
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <span className="text-3xl">🖼️</span>
-                    <span className="text-sm font-medium">{(c as any).coverImageHint || 'Click to upload (max 5 MB)'}</span>
-                  </div>
-                )}
-                <input type="file" accept="image/*" className="sr-only" onChange={handleImageChange} />
-              </label>
-              {imagePreview && (
-                <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); }}
-                  className="mt-2 text-xs text-destructive hover:underline">
-                  {(c as any).removeCover || 'Remove image'}
-                </button>
-              )}
-            </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <input

@@ -6,7 +6,7 @@ import { createNotification } from '@/lib/notifications';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'PATCH') return res.status(405).end();
-    const { id, title, description, location, category, capacity, start_date, end_date, ticket_types, image_url } = req.body;
+    const { id, title, description, location, category, capacity, start_date, end_date, ticket_types } = req.body;
 
     try {
         await db.update(events)
@@ -18,7 +18,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 capacity: parseInt(capacity),
                 startDate: new Date(start_date),
                 endDate: new Date(end_date),
-                ...(image_url !== undefined && { imageUrl: image_url }),
             })
             .where(eq(events.id, id));
 

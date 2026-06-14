@@ -10,12 +10,11 @@
       title: string;
       description: string;
       location: string;
-      startDate: string;
-      endDate: string;
+      start_date: string;
+      end_date: string;
       category: string;
       price: number | string;
-      isVirtual: boolean;
-      imageUrl?: string | null;
+      is_virtual: boolean;
     }
 
     export default function ExplorePage() {
@@ -74,8 +73,8 @@
 
         // Filter by Date if present in URL
         if (date) {
-          results = results.filter(event =>
-            event.startDate.startsWith(date as string)
+          results = results.filter(event => 
+            event.start_date.startsWith(date as string)
           );
         }
 
@@ -134,17 +133,13 @@
                     key={event.id}
                     className="group bg-card border border-border rounded-radius-4xl overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2 flex flex-col"
                   >
-                    <div className="h-52 bg-muted relative flex items-center justify-center group-hover:bg-primary/5 transition-colors overflow-hidden">
-                      {event.imageUrl ? (
-                        <img src={event.imageUrl} alt={event.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      ) : (
-                        <span className="text-5xl opacity-20 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
-                          {event.category === 'Technologie' ? '💻' : event.category === 'Musique' ? '🎵' : '📅'}
-                        </span>
-                      )}
+                    <div className="h-52 bg-muted relative flex items-center justify-center group-hover:bg-primary/5 transition-colors">
+                      <span className="text-5xl opacity-20 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
+                        {event.category === 'Technologie' ? '💻' : event.category === 'Musique' ? '🎵' : '📅'}
+                      </span>
                       <div className="absolute top-4 left-4 flex gap-2">
                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md ${event.is_virtual ? 'bg-chart-2/80 text-white' : 'bg-primary/80 text-primary-foreground'}`}>
-                          {event.isVirtual ? e.virtual : e.inPerson}
+                          {event.is_virtual ? e.virtual : e.inPerson}
                         </span>
                       </div>
                     </div>
@@ -152,7 +147,7 @@
                     <div className="p-6 flex flex-col flex-1">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-primary font-bold text-xs uppercase tracking-tighter">
-                          {formatDate(event.startDate)} • {formatTime(event.startDate)}
+                          {formatDate(event.start_date)} • {formatTime(event.start_date)}
                         </span>
                         <span className="text-[10px] font-bold text-muted-foreground uppercase">{event.category}</span>
                       </div>
