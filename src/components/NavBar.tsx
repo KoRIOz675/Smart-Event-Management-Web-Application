@@ -104,10 +104,9 @@ const NavBar = () => {
 
                     <div className="hidden md:flex space-x-8">
                         <Link href="/explore" className="block text-foreground font-medium py-2">{t.browse}</Link>
-                        {user?.role === 'organizer' && (<>
+                        {user?.role === 'organizer' && (
                             <Link href="/organizers" className="block text-foreground font-medium py-2">{t.organizers}</Link>
-                            <Link href="/analytics" className="block text-foreground font-medium py-2">{(t as any).analytics || 'Analytics'}</Link>
-                        </>)}
+                        )}
                         {user?.role === 'admin' && (
                             <Link href="/admin" className="block font-medium py-2" style={{ color: '#ef4444' }}>{t.admin}</Link>
                         )}
